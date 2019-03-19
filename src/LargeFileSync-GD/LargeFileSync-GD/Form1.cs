@@ -14,6 +14,7 @@ using Google.Apis.Drive.v3;
 using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
+using Newtonsoft.Json;
 
 namespace LargeFileSync_GD
 {
@@ -30,6 +31,25 @@ namespace LargeFileSync_GD
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+
+            using (StreamReader r = new StreamReader("credentials.json"))
+            {
+                string json = r.ReadToEnd();
+                RootObject credentialObject = JsonConvert.DeserializeObject<RootObject>(json);
+                
+                if (credentialObject.installed.client_id == "" ||
+                    credentialObject.installed.project_id == "" ||
+                    credentialObject.installed.client_secret == "")
+                {
+                    CredentialSetupForm credentialSetupForm = new CredentialSetupForm();
+                    r.Close();
+                    credentialSetupForm.ShowDialog();
+                }
+            }
+        }
+
+        private void readFiles()
         {
             UserCredential credential;
 
@@ -76,6 +96,23 @@ namespace LargeFileSync_GD
                 Console.WriteLine("No files found.");
             }
             Console.Read();
+        }
+
+        private void btnReAuthenticate_Click(object sender, EventArgs e)
+        {
+            CredentialSetupForm credentialSetupForm = new CredentialSetupForm();
+            credentialSetupForm.ShowDialog();
+        }
+
+        private void btnSyncFiles_Click(object sender, EventArgs e)
+        {
+            readFiles();
+        }
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            SettingsForm settingsForm = new SettingsForm();
+            settingsForm.ShowDialog();
         }
     }
 }

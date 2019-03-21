@@ -30,21 +30,51 @@ namespace LargeFileSync_GD
             InitializeComponent();
         }
 
+        public void updateTxtProjectID(string new_text)
+        {
+            txtProjectID.Text = new_text;
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (!System.IO.File.Exists("ContentFolderLocation.txt"))
+            {
+                using (StreamWriter sw = System.IO.File.CreateText("ContentFolderLocation.txt"))
+                {
+                    string blankFile = "";
+                    sw.WriteLine(blankFile);
+                }
+
+            }
+
+            txtMyContentFileLocation.Text = System.IO.File.ReadAllLines(@"ContentFolderLocation.txt")[0];
+
+            if (!System.IO.File.Exists("credentials.json"))
+            {
+                using (StreamWriter sw = System.IO.File.CreateText("credentials.json"))
+                {
+                    string blankJSON = "{\"installed\": {\"client_id\": \"\",\"project_id\": \"\",\"auth_uri\": \"\",\"token_uri\": \"\",\"auth_provider_x509_cert_url\": \"\",\"client_secret\": \"\",\"redirect_uris\": [ \"\", \"\"]}}";
+                    sw.WriteLine(blankJSON);
+                }
+                
+            }
 
             using (StreamReader r = new StreamReader("credentials.json"))
             {
                 string json = r.ReadToEnd();
                 RootObject credentialObject = JsonConvert.DeserializeObject<RootObject>(json);
-                
+
                 if (credentialObject.installed.client_id == "" ||
                     credentialObject.installed.project_id == "" ||
                     credentialObject.installed.client_secret == "")
                 {
-                    CredentialSetupForm credentialSetupForm = new CredentialSetupForm();
+                    CredentialSetupForm credentialSetupForm = new CredentialSetupForm(this);
                     r.Close();
                     credentialSetupForm.ShowDialog();
+                }
+                else
+                {
+                    txtProjectID.Text = credentialObject.installed.project_id;
                 }
             }
         }
@@ -100,7 +130,7 @@ namespace LargeFileSync_GD
 
         private void btnReAuthenticate_Click(object sender, EventArgs e)
         {
-            CredentialSetupForm credentialSetupForm = new CredentialSetupForm();
+            CredentialSetupForm credentialSetupForm = new CredentialSetupForm(this);
             credentialSetupForm.ShowDialog();
         }
 

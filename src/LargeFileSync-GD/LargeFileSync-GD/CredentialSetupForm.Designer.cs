@@ -35,6 +35,8 @@
             this.txtClientID = new System.Windows.Forms.TextBox();
             this.txtProjectID = new System.Windows.Forms.TextBox();
             this.txtClientSecret = new System.Windows.Forms.TextBox();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.btnLoadFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -66,7 +68,7 @@
             // 
             // btnConfirm
             // 
-            this.btnConfirm.Location = new System.Drawing.Point(311, 121);
+            this.btnConfirm.Location = new System.Drawing.Point(311, 118);
             this.btnConfirm.Name = "btnConfirm";
             this.btnConfirm.Size = new System.Drawing.Size(75, 23);
             this.btnConfirm.TabIndex = 4;
@@ -78,6 +80,7 @@
             // 
             this.txtClientID.Location = new System.Drawing.Point(138, 46);
             this.txtClientID.Name = "txtClientID";
+            this.txtClientID.ReadOnly = true;
             this.txtClientID.Size = new System.Drawing.Size(248, 20);
             this.txtClientID.TabIndex = 5;
             // 
@@ -85,6 +88,7 @@
             // 
             this.txtProjectID.Location = new System.Drawing.Point(138, 12);
             this.txtProjectID.Name = "txtProjectID";
+            this.txtProjectID.ReadOnly = true;
             this.txtProjectID.Size = new System.Drawing.Size(248, 20);
             this.txtProjectID.TabIndex = 6;
             // 
@@ -92,14 +96,30 @@
             // 
             this.txtClientSecret.Location = new System.Drawing.Point(138, 83);
             this.txtClientSecret.Name = "txtClientSecret";
+            this.txtClientSecret.ReadOnly = true;
             this.txtClientSecret.Size = new System.Drawing.Size(248, 20);
             this.txtClientSecret.TabIndex = 7;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // btnLoadFile
+            // 
+            this.btnLoadFile.Location = new System.Drawing.Point(50, 118);
+            this.btnLoadFile.Name = "btnLoadFile";
+            this.btnLoadFile.Size = new System.Drawing.Size(75, 23);
+            this.btnLoadFile.TabIndex = 8;
+            this.btnLoadFile.Text = "Load";
+            this.btnLoadFile.UseVisualStyleBackColor = true;
+            this.btnLoadFile.Click += new System.EventHandler(this.btnLoadFile_Click);
             // 
             // CredentialSetupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(449, 160);
+            this.ClientSize = new System.Drawing.Size(418, 160);
+            this.Controls.Add(this.btnLoadFile);
             this.Controls.Add(this.txtClientSecret);
             this.Controls.Add(this.txtProjectID);
             this.Controls.Add(this.txtClientID);
@@ -124,5 +144,7 @@
         private System.Windows.Forms.TextBox txtClientID;
         private System.Windows.Forms.TextBox txtProjectID;
         private System.Windows.Forms.TextBox txtClientSecret;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Button btnLoadFile;
     }
 }

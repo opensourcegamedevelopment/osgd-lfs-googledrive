@@ -141,7 +141,7 @@ namespace LargeFileSync_GD
                 }
             }
         }
-        private void readFiles()
+        private void readGoogleDriveFiles()
         {
             UserCredential credential;
 
@@ -166,39 +166,87 @@ namespace LargeFileSync_GD
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
-
-            // Define parameters of request.
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.PageSize = 10;
-            listRequest.Fields = "nextPageToken, files(id, name)";
-
-            // List files.
-            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute()
-                .Files;
-            Console.WriteLine("Files:");
-            if (files != null && files.Count > 0)
+            
+            string pageToken = null;
+            do
             {
-                bool foundPrjectFolder = false;
-                foreach (var file in files)
-                {
-                    if (file.Name == ProjectName)
-                    {
-                        foundPrjectFolder = true;
-                        Console.WriteLine("{0} ({1})", file.Name, file.Id);
+                // Define parameters of request.
+                FilesResource.ListRequest listRequest = service.Files.List();
+                listRequest.PageSize = 10;
+                //listRequest.Fields = "nextPageToken, files(id, name)";
+                listRequest.Fields = "nextPageToken, items(id, title)";
+                //listRequest.Q = "mimetype='application/vnd.google-apps.folder'";
+                listRequest.PageToken = pageToken;
 
+                // List files.
+                var result = listRequest.Execute();
+                IList<Google.Apis.Drive.v3.Data.File> files = result.Files;
+
+                Console.WriteLine("Google Drive Files:");
+                if (files != null && files.Count > 0)
+                {
+                    bool foundPrjectFolder = false;
+                    foreach (var file in files)
+                    {
+                        if (file.Name == ProjectName)
+                        {
+                            foundPrjectFolder = true;
+                            Console.WriteLine("{0} ({1})", file.Name, file.Id);
+
+                        }
+                    }
+
+                    if (!foundPrjectFolder)
+                    {
+                        MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
                     }
                 }
-
-                if (!foundPrjectFolder)
+                else
                 {
-                    MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
+                    MessageBox.Show("No files found.");
                 }
+                pageToken = result.NextPageToken;
+
+                Console.WriteLine("\n");
             }
-            else
-            {
-                MessageBox.Show("No files found.");
-            }
+            while (pageToken != null);
+
+            //FilesResource.ListRequest listRequest2 = service.Files.List();
+            //listRequest2.Q = "'root' in parents";
+            //var files2 = listRequest.Execute();
+            //Console.WriteLine(files2);
+
+
+            //string pageToken = null;
+            //do
+            //{
+            //    var request = service.Files.List();
+            //    request.Q = "mimeType='image/jpeg'";
+            //    request.Spaces = "drive";
+            //    request.Fields = "nextPageToken, items(id, title)";
+            //    request.PageToken = pageToken;
+            //    var result = request.Execute();
+            //    foreach (var file in result.Files)
+            //    {
+            //        Console.WriteLine(string.Format(
+            //                "Found file: {0} ({1})", file.Name, file.Id));
+            //    }
+            //    pageToken = result.NextPageToken;
+            //} while (pageToken != null);
+
+
             //Console.Read();
+        }
+
+        private void readLocalFiles()
+        {
+            string[] fileArray = Directory.GetFiles(txtMyContentFileLocation.Text, "*", SearchOption.AllDirectories);
+
+            Console.WriteLine("\nLocal Files:");
+            foreach (string fileName in fileArray)
+            {
+                Console.WriteLine(fileName);
+            }
         }
 
         #region buttonClicks()
@@ -216,7 +264,8 @@ namespace LargeFileSync_GD
         {
             if (correctSettings())
             {
-                readFiles();
+                readGoogleDriveFiles();
+                readLocalFiles();
             }
         }
         private bool correctSettings()

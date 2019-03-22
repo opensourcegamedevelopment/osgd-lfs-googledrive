@@ -36,6 +36,8 @@
             this.txtProjectID = new System.Windows.Forms.TextBox();
             this.txtMyContentFileLocation = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtProjectName = new System.Windows.Forms.TextBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,7 +53,7 @@
             // 
             // btnSettings
             // 
-            this.btnSettings.Location = new System.Drawing.Point(230, 95);
+            this.btnSettings.Location = new System.Drawing.Point(230, 121);
             this.btnSettings.Name = "btnSettings";
             this.btnSettings.Size = new System.Drawing.Size(205, 38);
             this.btnSettings.TabIndex = 2;
@@ -61,7 +63,7 @@
             // 
             // btnReAuthenticate
             // 
-            this.btnReAuthenticate.Location = new System.Drawing.Point(12, 95);
+            this.btnReAuthenticate.Location = new System.Drawing.Point(12, 121);
             this.btnReAuthenticate.Name = "btnReAuthenticate";
             this.btnReAuthenticate.Size = new System.Drawing.Size(212, 38);
             this.btnReAuthenticate.TabIndex = 3;
@@ -72,7 +74,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(18, 43);
+            this.label1.Location = new System.Drawing.Point(12, 72);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(130, 13);
             this.label1.TabIndex = 4;
@@ -81,7 +83,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(18, 14);
+            this.label2.Location = new System.Drawing.Point(12, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(57, 13);
             this.label2.TabIndex = 5;
@@ -97,7 +99,7 @@
             // 
             // txtMyContentFileLocation
             // 
-            this.txtMyContentFileLocation.Location = new System.Drawing.Point(148, 43);
+            this.txtMyContentFileLocation.Location = new System.Drawing.Point(148, 69);
             this.txtMyContentFileLocation.Name = "txtMyContentFileLocation";
             this.txtMyContentFileLocation.ReadOnly = true;
             this.txtMyContentFileLocation.Size = new System.Drawing.Size(249, 20);
@@ -105,20 +107,39 @@
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.txtProjectName);
+            this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.label1);
             this.panel1.Controls.Add(this.txtMyContentFileLocation);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.txtProjectID);
             this.panel1.Location = new System.Drawing.Point(12, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(423, 77);
+            this.panel1.Size = new System.Drawing.Size(423, 103);
             this.panel1.TabIndex = 10;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(12, 43);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(74, 13);
+            this.label3.TabIndex = 8;
+            this.label3.Text = "ProjectName: ";
+            // 
+            // txtProjectName
+            // 
+            this.txtProjectName.Location = new System.Drawing.Point(148, 40);
+            this.txtProjectName.Name = "txtProjectName";
+            this.txtProjectName.ReadOnly = true;
+            this.txtProjectName.Size = new System.Drawing.Size(249, 20);
+            this.txtProjectName.TabIndex = 9;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 146);
+            this.ClientSize = new System.Drawing.Size(651, 171);
             this.Controls.Add(this.btnSyncFiles);
             this.Controls.Add(this.btnReAuthenticate);
             this.Controls.Add(this.panel1);
@@ -141,6 +162,8 @@
         private System.Windows.Forms.TextBox txtProjectID;
         private System.Windows.Forms.TextBox txtMyContentFileLocation;
         private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox txtProjectName;
+        private System.Windows.Forms.Label label3;
     }
 }
 

@@ -13,9 +13,11 @@ namespace LargeFileSync_GD
 {
     public partial class SettingsForm : Form
     {
-        public SettingsForm()
+        Form1 frm1;
+        public SettingsForm(Form1 parent)
         {
             InitializeComponent();
+            frm1 = parent;
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
@@ -23,11 +25,19 @@ namespace LargeFileSync_GD
             string[] lines = { txtMyContentFileLocation.Text };
             File.WriteAllLines(@"ContentFolderLocation.txt", lines);
             this.Close();
+
+            string[] lines2 = { txtProjectName.Text };
+            File.WriteAllLines(@"ProjectName.txt", lines2);
+            this.Close();
+
+            frm1.updateTxtContentFolderLocation(lines[0]);
+            frm1.updateTxtProjectName(lines2[0]);
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)
         {
             txtMyContentFileLocation.Text = File.ReadAllLines(@"ContentFolderLocation.txt")[0];
+            txtProjectName.Text = File.ReadAllLines(@"ProjectName.txt")[0];
         }
     }
 }

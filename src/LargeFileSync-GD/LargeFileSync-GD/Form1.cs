@@ -25,15 +25,42 @@ namespace LargeFileSync_GD
         static string[] Scopes = { DriveService.Scope.DriveReadonly };
         static string ApplicationName = "Large File Sync for Google Drive - Made By Open Source Game Dev";
 
+        static string client_id = "";
+        static string project_id = "";
+        static string client_secret = "";
+        static string ContentFolderLocation = "";
+        static string ProjectName = "";
+
         public Form1()
         {
             InitializeComponent();
         }
 
+        #region expose fields to other forms
+        public void updateTxtClientID(string new_text)
+        {
+            client_id = new_text;
+        }
         public void updateTxtProjectID(string new_text)
         {
             txtProjectID.Text = new_text;
+            project_id = new_text;
         }
+        public void updateTxtClientSecret(string new_text)
+        {
+            ContentFolderLocation = new_text;
+        }
+        public void updateTxtContentFolderLocation(string new_text)
+        {
+            txtMyContentFileLocation.Text = new_text;
+            project_id = new_text;
+        }
+        public void updateTxtProjectName(string new_text)
+        {
+            txtProjectName.Text = new_text;
+            ProjectName = new_text;
+        }
+        #endregion
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -46,6 +73,32 @@ namespace LargeFileSync_GD
                 }
 
             }
+            else
+            {
+                using (StreamReader r = new StreamReader("ContentFolderLocation.txt"))
+                {
+                    ContentFolderLocation = r.ReadLine();
+                    txtProjectName.Text = ContentFolderLocation;
+                }
+            }
+
+            if (!System.IO.File.Exists("ProjectName.txt"))
+            {
+                using (StreamWriter sw = System.IO.File.CreateText("ProjectName.txt"))
+                {
+                    string blankFile = "";
+                    sw.WriteLine(blankFile);
+                }
+
+            }
+            else
+            {
+                using (StreamReader r = new StreamReader("ProjectName.txt"))
+                {
+                    ProjectName = r.ReadLine();
+                    txtProjectName.Text = ProjectName;
+                }
+            }
 
             txtMyContentFileLocation.Text = System.IO.File.ReadAllLines(@"ContentFolderLocation.txt")[0];
 
@@ -57,6 +110,13 @@ namespace LargeFileSync_GD
                     sw.WriteLine(blankJSON);
                 }
                 
+            }
+            else
+            {
+                using (StreamReader r = new StreamReader("ContentFolderLocation.txt"))
+                {
+                    ContentFolderLocation = r.ReadLine();
+                }
             }
 
             using (StreamReader r = new StreamReader("credentials.json"))
@@ -75,10 +135,12 @@ namespace LargeFileSync_GD
                 else
                 {
                     txtProjectID.Text = credentialObject.installed.project_id;
+                    client_id = credentialObject.installed.client_id;
+                    project_id = credentialObject.installed.project_id;
+                    client_secret = credentialObject.installed.client_secret;
                 }
             }
         }
-
         private void readFiles()
         {
             UserCredential credential;
@@ -116,33 +178,79 @@ namespace LargeFileSync_GD
             Console.WriteLine("Files:");
             if (files != null && files.Count > 0)
             {
+                bool foundPrjectFolder = false;
                 foreach (var file in files)
                 {
-                    Console.WriteLine("{0} ({1})", file.Name, file.Id);
+                    if (file.Name == ProjectName)
+                    {
+                        foundPrjectFolder = true;
+                        Console.WriteLine("{0} ({1})", file.Name, file.Id);
+
+                    }
+                }
+
+                if (!foundPrjectFolder)
+                {
+                    MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
                 }
             }
             else
             {
-                Console.WriteLine("No files found.");
+                MessageBox.Show("No files found.");
             }
-            Console.Read();
+            //Console.Read();
         }
 
+        #region buttonClicks()
         private void btnReAuthenticate_Click(object sender, EventArgs e)
         {
             CredentialSetupForm credentialSetupForm = new CredentialSetupForm(this);
             credentialSetupForm.ShowDialog();
         }
-
-        private void btnSyncFiles_Click(object sender, EventArgs e)
-        {
-            readFiles();
-        }
-
         private void btnSettings_Click(object sender, EventArgs e)
         {
-            SettingsForm settingsForm = new SettingsForm();
+            SettingsForm settingsForm = new SettingsForm(this);
             settingsForm.ShowDialog();
         }
+        private void btnSyncFiles_Click(object sender, EventArgs e)
+        {
+            if (correctSettings())
+            {
+                readFiles();
+            }
+        }
+        private bool correctSettings()
+        {
+            if (client_id == "")
+            {
+                MessageBox.Show("Missing client_id");
+                return false;
+            }
+            else if (project_id == "")
+            {
+                MessageBox.Show("Missing project_id");
+                return false;
+            }
+            else if (client_secret == "")
+            {
+                MessageBox.Show("Missing client_secret");
+                return false;
+            }
+            else if (ContentFolderLocation == "")
+            {
+                MessageBox.Show("Missing ContentFolderLocation");
+                return false;
+            }
+            else if (ProjectName == "")
+            {
+                MessageBox.Show("Missing ProjectName");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        #endregion
     }
 }

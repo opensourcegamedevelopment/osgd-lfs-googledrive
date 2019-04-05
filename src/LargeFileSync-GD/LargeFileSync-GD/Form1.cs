@@ -168,13 +168,15 @@ namespace LargeFileSync_GD
             });
             
             string pageToken = null;
+            bool foundPrjectFolder = false;
+            Console.WriteLine("Google Drive Files:");
             do
             {
                 // Define parameters of request.
                 FilesResource.ListRequest listRequest = service.Files.List();
                 listRequest.PageSize = 10;
-                //listRequest.Fields = "nextPageToken, files(id, name)";
-                listRequest.Fields = "nextPageToken, items(id, title)";
+                listRequest.Fields = "nextPageToken, files(id, name)";
+                //listRequest.Fields = "nextPageToken, items(id, title)";
                 //listRequest.Q = "mimetype='application/vnd.google-apps.folder'";
                 listRequest.PageToken = pageToken;
 
@@ -182,23 +184,25 @@ namespace LargeFileSync_GD
                 var result = listRequest.Execute();
                 IList<Google.Apis.Drive.v3.Data.File> files = result.Files;
 
-                Console.WriteLine("Google Drive Files:");
                 if (files != null && files.Count > 0)
                 {
-                    bool foundPrjectFolder = false;
                     foreach (var file in files)
                     {
-                        if (file.Name == ProjectName)
+                        string fileName = "";
+                        if (file.Name.Length >= ProjectName.Length)
+                        {
+                            fileName = file.Name.Substring(0, ProjectName.Length);
+                        }
+                        //Console.WriteLine("name: " + fileName);
+
+                       // Console.WriteLine("{0} ({1})", file.Name, file.Id);
+
+                        if (fileName == ProjectName)
                         {
                             foundPrjectFolder = true;
                             Console.WriteLine("{0} ({1})", file.Name, file.Id);
 
                         }
-                    }
-
-                    if (!foundPrjectFolder)
-                    {
-                        MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
                     }
                 }
                 else
@@ -210,6 +214,11 @@ namespace LargeFileSync_GD
                 Console.WriteLine("\n");
             }
             while (pageToken != null);
+
+            if (!foundPrjectFolder)
+            {
+                MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
+            }
 
             //FilesResource.ListRequest listRequest2 = service.Files.List();
             //listRequest2.Q = "'root' in parents";

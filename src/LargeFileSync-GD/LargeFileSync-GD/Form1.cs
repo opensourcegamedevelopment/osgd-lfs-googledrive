@@ -173,21 +173,31 @@ namespace LargeFileSync_GD
             do
             {
                 // Define parameters of request.
+                // Get root folder
+                //FilesResource.ListRequest listRequest = service.Files.List();
+                //listRequest.PageSize = 10;
+                //listRequest.Fields = "nextPageToken, files(id, name)";
+                //listRequest.PageToken = pageToken;
+
                 FilesResource.ListRequest listRequest = service.Files.List();
-                listRequest.PageSize = 10;
+                listRequest.PageSize = 100;
                 listRequest.Fields = "nextPageToken, files(id, name)";
-                //listRequest.Fields = "nextPageToken, items(id, title)";
-                //listRequest.Q = "mimetype='application/vnd.google-apps.folder'";
                 listRequest.PageToken = pageToken;
+                //listRequest.IncludeTeamDriveItems = true;
+                //listRequest.SupportsTeamDrives = true;
+                //listRequest.Q = "sharedWithMe=true";
 
                 // List files.
                 var result = listRequest.Execute();
                 IList<Google.Apis.Drive.v3.Data.File> files = result.Files;
+                
+                Console.WriteLine("Count:: " + result.Files.Count);
 
                 if (files != null && files.Count > 0)
                 {
                     foreach (var file in files)
                     {
+                        Console.WriteLine("Files:: " + file.Name);
                         string fileName = "";
                         if (file.Name.Length >= ProjectName.Length)
                         {
@@ -219,42 +229,51 @@ namespace LargeFileSync_GD
             {
                 MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
             }
-
-            //FilesResource.ListRequest listRequest2 = service.Files.List();
-            //listRequest2.Q = "'root' in parents";
-            //var files2 = listRequest.Execute();
-            //Console.WriteLine(files2);
-
-
-            //string pageToken = null;
-            //do
-            //{
-            //    var request = service.Files.List();
-            //    request.Q = "mimeType='image/jpeg'";
-            //    request.Spaces = "drive";
-            //    request.Fields = "nextPageToken, items(id, title)";
-            //    request.PageToken = pageToken;
-            //    var result = request.Execute();
-            //    foreach (var file in result.Files)
-            //    {
-            //        Console.WriteLine(string.Format(
-            //                "Found file: {0} ({1})", file.Name, file.Id));
-            //    }
-            //    pageToken = result.NextPageToken;
-            //} while (pageToken != null);
-
-
-            //Console.Read();
         }
 
         private void readLocalFiles()
         {
-            string[] fileArray = Directory.GetFiles(txtMyContentFileLocation.Text, "*", SearchOption.AllDirectories);
+            string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
+            Console.WriteLine(LargeDataFolderLocation);
+
+            string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
 
             Console.WriteLine("\nLocal Files:");
             foreach (string fileName in fileArray)
             {
                 Console.WriteLine(fileName);
+            }
+        }
+
+        private void createLocalFilesMetaData()
+        {
+            System.IO.FileInfo file = new System.IO.FileInfo("metadata\\important.txt");
+            file.Directory.Create();
+
+            using (StreamWriter writer = new StreamWriter("metadata\\important.txt"))
+            {
+                Metadata metadata = new Metadata();
+
+                string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
+
+                string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
+                
+                foreach (string fileName in fileArray)
+                {
+                    Console.WriteLine(fileName);
+
+                    Data data = new Data();
+                    data.fileName = fileName;
+                    data.filePath = fileName;
+                    metadata.data.Add(data);
+
+                    //writer.WriteLine(fileName);
+                }
+               
+
+                string newJson = JsonConvert.SerializeObject(metadata);
+                writer.Write(newJson);
+
             }
         }
 
@@ -275,6 +294,7 @@ namespace LargeFileSync_GD
             {
                 readGoogleDriveFiles();
                 readLocalFiles();
+                createLocalFilesMetaData();
             }
         }
         private bool correctSettings()

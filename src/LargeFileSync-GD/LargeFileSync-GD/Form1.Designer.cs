@@ -36,8 +36,9 @@
             this.txtProjectID = new System.Windows.Forms.TextBox();
             this.txtMyContentFileLocation = new System.Windows.Forms.TextBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label3 = new System.Windows.Forms.Label();
             this.txtProjectName = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.btnGenerateMetaData = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,7 +46,7 @@
             // 
             this.btnSyncFiles.Location = new System.Drawing.Point(452, 12);
             this.btnSyncFiles.Name = "btnSyncFiles";
-            this.btnSyncFiles.Size = new System.Drawing.Size(187, 121);
+            this.btnSyncFiles.Size = new System.Drawing.Size(187, 103);
             this.btnSyncFiles.TabIndex = 1;
             this.btnSyncFiles.Text = "Sync Content Files";
             this.btnSyncFiles.UseVisualStyleBackColor = true;
@@ -118,6 +119,14 @@
             this.panel1.Size = new System.Drawing.Size(423, 103);
             this.panel1.TabIndex = 10;
             // 
+            // txtProjectName
+            // 
+            this.txtProjectName.Location = new System.Drawing.Point(148, 40);
+            this.txtProjectName.Name = "txtProjectName";
+            this.txtProjectName.ReadOnly = true;
+            this.txtProjectName.Size = new System.Drawing.Size(249, 20);
+            this.txtProjectName.TabIndex = 9;
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -127,25 +136,28 @@
             this.label3.TabIndex = 8;
             this.label3.Text = "ProjectName: ";
             // 
-            // txtProjectName
+            // btnGenerateMetaData
             // 
-            this.txtProjectName.Location = new System.Drawing.Point(148, 40);
-            this.txtProjectName.Name = "txtProjectName";
-            this.txtProjectName.ReadOnly = true;
-            this.txtProjectName.Size = new System.Drawing.Size(249, 20);
-            this.txtProjectName.TabIndex = 9;
+            this.btnGenerateMetaData.Location = new System.Drawing.Point(452, 122);
+            this.btnGenerateMetaData.Name = "btnGenerateMetaData";
+            this.btnGenerateMetaData.Size = new System.Drawing.Size(187, 37);
+            this.btnGenerateMetaData.TabIndex = 11;
+            this.btnGenerateMetaData.Text = "GenerateMetaData";
+            this.btnGenerateMetaData.UseVisualStyleBackColor = true;
+            this.btnGenerateMetaData.Click += new System.EventHandler(this.btnGenerateMetaData_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(651, 171);
+            this.Controls.Add(this.btnGenerateMetaData);
             this.Controls.Add(this.btnSyncFiles);
             this.Controls.Add(this.btnReAuthenticate);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.btnSettings);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "GoogleDrive-Large File Sync";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -164,6 +176,7 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TextBox txtProjectName;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button btnGenerateMetaData;
     }
 }
 

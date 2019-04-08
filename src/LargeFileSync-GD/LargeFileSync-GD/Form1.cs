@@ -245,14 +245,20 @@ namespace LargeFileSync_GD
             }
         }
 
-        private void createLocalFilesMetaData()
+        private void createLocalFilesTimeStampData()
         {
-            System.IO.FileInfo file = new System.IO.FileInfo("metadata\\important.json");
+            string timeStamp = DateTime.Now.ToString("yyyyMMddThhmm");
+            Console.WriteLine(timeStamp);
+
+            System.IO.FileInfo file = new System.IO.FileInfo(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json");
+
+            Console.WriteLine(file);
+
             file.Directory.Create();
 
-            using (StreamWriter writer = new StreamWriter("metadata\\important.json"))
+            using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json"))
             {
-                Metadata metadata = new Metadata();
+                TimeStamp metadata = new TimeStamp();
 
                 string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
 
@@ -270,10 +276,67 @@ namespace LargeFileSync_GD
                     data.filePath = relativePath;
                     metadata.data.Add(data);
                 }
-                
+
                 string newJson = JsonConvert.SerializeObject(metadata);
                 writer.Write(newJson);
             }
+
+            string newTiemStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json";
+            string oldTiemStampFileName = "";
+            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+            {
+                Metadata data = JsonConvert.DeserializeObject(reader.ReadToEnd()) as Metadata;
+                Console.WriteLine(data);
+
+                oldTiemStampFileName = data.currentVersion;
+            }
+
+            string oldTiemStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTiemStampFileName + ".json";
+
+            
+            if (FileEquals(newTiemStampFile, oldTiemStampFile))//check if the new file actually contain new data
+            {
+                System.IO.File.Delete(newTiemStampFile);
+                MessageBox.Show("No New data");
+            }
+            else
+            {
+                updateMetaData(timeStamp);
+                string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTiemStampFile) + ".json \n";
+                msg = "metadata.json file updated";
+                MessageBox.Show(msg);
+            }
+        }
+
+        private void updateMetaData(string timeStamp)
+        {
+            System.IO.FileInfo file = new System.IO.FileInfo(txtMyContentFileLocation.Text + "\\LFS\\metadata.json");
+            file.Directory.Create();
+            using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+            {
+                Metadata metadata = new Metadata();
+                metadata.currentVersion = timeStamp;
+                string newJson = JsonConvert.SerializeObject(metadata);
+                writer.Write(newJson);
+            }
+        }
+
+        static bool FileEquals(string path1, string path2)
+        {
+            byte[] file1 = System.IO.File.ReadAllBytes(path1);
+            byte[] file2 = System.IO.File.ReadAllBytes(path2);
+            if (file1.Length == file2.Length)
+            {
+                for (int i = 0; i < file1.Length; i++)
+                {
+                    if (file1[i] != file2[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
         #region buttonClicks()
@@ -292,8 +355,8 @@ namespace LargeFileSync_GD
             if (correctSettings())
             {
                 readGoogleDriveFiles();
-                //readLocalFiles();
-                createLocalFilesMetaData();
+                readLocalFiles();
+                //createLocalFilesMetaData();
             }
         }
         private bool correctSettings()
@@ -329,5 +392,17 @@ namespace LargeFileSync_GD
             }
         }
         #endregion
+
+        private void btnGenerateMetaData_Click(object sender, EventArgs e)
+        {
+#if DEBUG
+            createLocalFilesTimeStampData();
+#endif
+
+#if RELEASE
+            MessageBox.Show("Available for Debug Mode Only - For ppl that know what this is doing!");
+#endif
+
+        }
     }
 }

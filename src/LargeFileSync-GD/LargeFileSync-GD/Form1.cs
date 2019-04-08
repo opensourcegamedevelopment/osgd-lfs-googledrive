@@ -285,10 +285,9 @@ namespace LargeFileSync_GD
             string oldTiemStampFileName = "";
             using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
             {
-                Metadata data = JsonConvert.DeserializeObject(reader.ReadToEnd()) as Metadata;
-                Console.WriteLine(data);
-
-                oldTiemStampFileName = data.currentVersion;
+                string data = reader.ReadToEnd();
+                Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
+                oldTiemStampFileName = metadata.currentVersion;
             }
 
             string oldTiemStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTiemStampFileName + ".json";

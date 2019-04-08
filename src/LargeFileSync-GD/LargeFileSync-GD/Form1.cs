@@ -247,33 +247,32 @@ namespace LargeFileSync_GD
 
         private void createLocalFilesMetaData()
         {
-            System.IO.FileInfo file = new System.IO.FileInfo("metadata\\important.txt");
+            System.IO.FileInfo file = new System.IO.FileInfo("metadata\\important.json");
             file.Directory.Create();
 
-            using (StreamWriter writer = new StreamWriter("metadata\\important.txt"))
+            using (StreamWriter writer = new StreamWriter("metadata\\important.json"))
             {
                 Metadata metadata = new Metadata();
 
                 string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
 
                 string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
-                
-                foreach (string fileName in fileArray)
+
+                string currentDir = Directory.GetCurrentDirectory();
+
+                foreach (string filePath in fileArray)
                 {
-                    Console.WriteLine(fileName);
+                    string fileName = System.IO.Path.GetFileName(filePath);
+                    string relativePath = filePath.Substring(LargeDataFolderLocation.Length);
 
                     Data data = new Data();
                     data.fileName = fileName;
-                    data.filePath = fileName;
+                    data.filePath = relativePath;
                     metadata.data.Add(data);
-
-                    //writer.WriteLine(fileName);
                 }
-               
-
+                
                 string newJson = JsonConvert.SerializeObject(metadata);
                 writer.Write(newJson);
-
             }
         }
 
@@ -293,7 +292,7 @@ namespace LargeFileSync_GD
             if (correctSettings())
             {
                 readGoogleDriveFiles();
-                readLocalFiles();
+                //readLocalFiles();
                 createLocalFilesMetaData();
             }
         }

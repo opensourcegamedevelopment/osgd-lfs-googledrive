@@ -39,6 +39,7 @@
             this.txtProjectName = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnGenerateMetaData = new System.Windows.Forms.Button();
+            this.OutputArea = new System.Windows.Forms.RichTextBox();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -146,11 +147,24 @@
             this.btnGenerateMetaData.UseVisualStyleBackColor = true;
             this.btnGenerateMetaData.Click += new System.EventHandler(this.btnGenerateMetaData_Click);
             // 
+            // OutputArea
+            // 
+            this.OutputArea.BackColor = System.Drawing.SystemColors.WindowFrame;
+            this.OutputArea.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OutputArea.ForeColor = System.Drawing.SystemColors.Info;
+            this.OutputArea.Location = new System.Drawing.Point(12, 165);
+            this.OutputArea.Name = "OutputArea";
+            this.OutputArea.ReadOnly = true;
+            this.OutputArea.Size = new System.Drawing.Size(627, 215);
+            this.OutputArea.TabIndex = 13;
+            this.OutputArea.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 171);
+            this.ClientSize = new System.Drawing.Size(651, 392);
+            this.Controls.Add(this.OutputArea);
             this.Controls.Add(this.btnGenerateMetaData);
             this.Controls.Add(this.btnSyncFiles);
             this.Controls.Add(this.btnReAuthenticate);
@@ -177,6 +191,7 @@
         private System.Windows.Forms.TextBox txtProjectName;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnGenerateMetaData;
+        private System.Windows.Forms.RichTextBox OutputArea;
     }
 }
 

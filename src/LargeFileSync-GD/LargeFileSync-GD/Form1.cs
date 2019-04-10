@@ -245,6 +245,71 @@ namespace LargeFileSync_GD
             }
         }
 
+        private void syncData()
+        {
+            //readGoogleDriveFiles();
+            //readLocalFiles();
+
+            //get metadata
+            string timeStampFileName = "";
+            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+            {
+                string data = reader.ReadToEnd();
+                Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
+                timeStampFileName = metadata.currentVersion;
+            }
+            
+
+            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+            {
+                string data = reader.ReadToEnd();
+                TimeStamp filesList = JsonConvert.DeserializeObject<TimeStamp>(data);
+                
+                string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
+
+                string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
+
+                Console.WriteLine("\nLocal Files:");
+
+                //loop through current directory for each file check if exist in metadata, if not, delete
+                OutputArea.Text += "Searching for deleted files\n\n";
+                foreach (string filePath in fileArray)
+                {
+                    bool fileFound = false;
+                    string relativePath = filePath.Substring(LargeDataFolderLocation.Length);
+                    
+                    foreach (Data fileData in filesList.data)
+                    {
+                        if (fileData.filePath == relativePath)
+                        {
+                            Console.WriteLine("Found: " + relativePath);
+                            fileFound = true;
+                        }
+                    }
+
+                    if (!fileFound)
+                    {
+                        System.IO.File.Delete(filePath);
+
+                        OutputArea.Text += "Local File Deleted: " + filePath + "\n";
+                    }
+                }
+            }
+
+            
+
+            //loop through each directory delete folder if empty
+            cleanUpEmptyFolders();
+
+            //add all new assets
+            OutputArea.Text += "Done\n";
+        }
+
+        private void cleanUpEmptyFolders()
+        {
+
+        }
+
         private void createLocalFilesTimeStampData()
         {
             string timeStamp = DateTime.Now.ToString("yyyyMMddThhmm");
@@ -281,27 +346,27 @@ namespace LargeFileSync_GD
                 writer.Write(newJson);
             }
 
-            string newTiemStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json";
-            string oldTiemStampFileName = "";
+            string newTimeStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json";
+            string oldTimeStampFileName = "";
             using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
             {
                 string data = reader.ReadToEnd();
                 Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
-                oldTiemStampFileName = metadata.currentVersion;
+                oldTimeStampFileName = metadata.currentVersion;
             }
 
-            string oldTiemStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTiemStampFileName + ".json";
+            string oldTimeStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTimeStampFileName + ".json";
 
             
-            if (FileEquals(newTiemStampFile, oldTiemStampFile))//check if the new file actually contain new data
+            if (FileEquals(newTimeStampFile, oldTimeStampFile))//check if the new file actually contain new data
             {
-                System.IO.File.Delete(newTiemStampFile);
+                System.IO.File.Delete(newTimeStampFile);
                 MessageBox.Show("No New data");
             }
             else
             {
                 updateMetaData(timeStamp);
-                string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTiemStampFile) + ".json \n";
+                string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTimeStampFile) + ".json \n";
                 msg = "metadata.json file updated";
                 MessageBox.Show(msg);
             }
@@ -318,6 +383,18 @@ namespace LargeFileSync_GD
                 string newJson = JsonConvert.SerializeObject(metadata);
                 writer.Write(newJson);
             }
+        }
+
+        private void btnGenerateMetaData_Click(object sender, EventArgs e)
+        {
+#if DEBUG
+            createLocalFilesTimeStampData();
+#endif
+
+#if RELEASE
+            MessageBox.Show("Available for Debug Mode Only - For ppl that know what this is doing!");
+#endif
+
         }
 
         static bool FileEquals(string path1, string path2)
@@ -353,9 +430,7 @@ namespace LargeFileSync_GD
         {
             if (correctSettings())
             {
-                readGoogleDriveFiles();
-                readLocalFiles();
-                //createLocalFilesMetaData();
+                syncData();
             }
         }
         private bool correctSettings()
@@ -391,17 +466,6 @@ namespace LargeFileSync_GD
             }
         }
         #endregion
-
-        private void btnGenerateMetaData_Click(object sender, EventArgs e)
-        {
-#if DEBUG
-            createLocalFilesTimeStampData();
-#endif
-
-#if RELEASE
-            MessageBox.Show("Available for Debug Mode Only - For ppl that know what this is doing!");
-#endif
-
-        }
+        
     }
 }

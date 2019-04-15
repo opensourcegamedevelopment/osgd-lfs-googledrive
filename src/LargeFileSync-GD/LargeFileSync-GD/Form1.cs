@@ -31,6 +31,9 @@ namespace LargeFileSync_GD
         static string ContentFolderLocation = "";
         static string ProjectName = "";
 
+        private UserCredential credential;
+        private DriveService service;
+
         public Form1()
         {
             InitializeComponent();
@@ -141,10 +144,9 @@ namespace LargeFileSync_GD
                 }
             }
         }
-        private void readGoogleDriveFiles()
-        {
-            UserCredential credential;
 
+        private void authenticate()
+        {
             using (var stream =
                 new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
             {
@@ -161,14 +163,17 @@ namespace LargeFileSync_GD
             }
 
             // Create Drive API service.
-            var service = new DriveService(new BaseClientService.Initializer()
+            service = new DriveService(new BaseClientService.Initializer()
             {
                 HttpClientInitializer = credential,
                 ApplicationName = ApplicationName,
             });
-            
+        }
+
+        private void readGoogleDriveFiles()
+        {
             string pageToken = null;
-            bool foundPrjectFolder = false;
+            bool foundProjectFolder = false;
             Console.WriteLine("Google Drive Files:");
             do
             {
@@ -209,7 +214,7 @@ namespace LargeFileSync_GD
 
                         if (fileName == ProjectName)
                         {
-                            foundPrjectFolder = true;
+                            foundProjectFolder = true;
                             Console.WriteLine("{0} ({1})", file.Name, file.Id);
 
                         }
@@ -225,7 +230,7 @@ namespace LargeFileSync_GD
             }
             while (pageToken != null);
 
-            if (!foundPrjectFolder)
+            if (!foundProjectFolder)
             {
                 MessageBox.Show("No Project Folder found. \nDid you clicked on the share folder link and recieved the share folder?");
             }
@@ -264,33 +269,33 @@ namespace LargeFileSync_GD
             using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
             {
                 string data = reader.ReadToEnd();
-                TimeStamp filesList = JsonConvert.DeserializeObject<TimeStamp>(data);
+                TimeStamp metaDataFiles = JsonConvert.DeserializeObject<TimeStamp>(data);
 
-                string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
+                string[] LocalFilesArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
 
-                Console.WriteLine("\nLocal Files:");
+                //Console.WriteLine("\nLocal Files:");
 
                 //loop through current directory for each file check if exist in metadata, if not, delete
                 OutputArea.Text += "Searching for deleted files\n\n";
-                foreach (string filePath in fileArray)
+                foreach (string LocalFile in LocalFilesArray)
                 {
                     bool fileFound = false;
-                    string relativePath = filePath.Substring(LargeDataFolderLocation.Length);
+                    string LocalFileRelativePath = LocalFile.Substring(LargeDataFolderLocation.Length);
                     
-                    foreach (Data fileData in filesList.data)
+                    foreach (Data metaDataFile in metaDataFiles.data)
                     {
-                        if (fileData.filePath == relativePath)
+                        if (metaDataFile.filePath == LocalFileRelativePath)
                         {
-                            Console.WriteLine("Found: " + relativePath);
+                            //Console.WriteLine("Found: " + relativePath);
                             fileFound = true;
                         }
                     }
 
                     if (!fileFound)
                     {
-                        System.IO.File.Delete(filePath);
+                        System.IO.File.Delete(LocalFile);
 
-                        OutputArea.Text += "Local File Deleted: " + filePath + "\n";
+                        OutputArea.Text += "Local File Deleted: " + LocalFile + "\n";
                     }
                 }
             }
@@ -300,10 +305,103 @@ namespace LargeFileSync_GD
             cleanUpEmptyFolders(LargeDataFolderLocation);
 
             //add all new assets
-
+            syncNewFiles(LargeDataFolderLocation, timeStampFileName);
 
             //Done
             OutputArea.Text += "\nDone\n";
+        }
+
+        private void syncNewFiles(string LargeDataFolderLocation, string timeStampFileName)
+        {
+            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+            {
+                string data = reader.ReadToEnd();
+                TimeStamp metaDataFiles = JsonConvert.DeserializeObject<TimeStamp>(data);
+
+                string[] LocalFilesArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
+
+
+                //loop through metadata and check if current directory contain the file. If not, Download
+                OutputArea.Text += "Searching for files to download\n\n";
+                foreach (Data metaDataFile in metaDataFiles.data)
+                {
+                    bool fileFound = false;
+                    foreach (string LocalFile in LocalFilesArray)
+                    {
+                        string LocalFileRelativePath = LocalFile.Substring(LargeDataFolderLocation.Length);
+
+                        if (metaDataFile.filePath == LocalFileRelativePath)
+                        {
+                            fileFound = true;
+                        }
+                    }
+
+                    if (!fileFound)
+                    {
+                        OutputArea.Text += "File Not Found: " + metaDataFile.filePath + "\n";
+                        //download file
+                        string saveToLocation = LargeDataFolderLocation + metaDataFile.filePath;
+                        OutputArea.Text += "File will be Save to: " + saveToLocation + "\n";
+                        //Google.Apis.Drive.v3.Data.File gFile = getFileFromGDrive(metaDataFile.fileName);
+                        //downloadFile(service, gFile, saveToLocation);
+                    }
+                }
+                
+            }
+        }
+
+        //private Google.Apis.Drive.v3.Data.File getFileFromGDrive(string fileName)
+        //{
+        //    FilesResource.ListRequest listRequest = service.Files.List();
+        //    listRequest.PageSize = 100;
+        //    listRequest.Fields = "nextPageToken, files(id, name)";
+
+        //    // List files.
+        //    var result = listRequest.Execute();
+        //    IList<Google.Apis.Drive.v3.Data.File> files = result.Files;
+
+        //    return "";
+        //}
+
+        private void downloadFile(DriveService service, Google.Apis.Drive.v3.Data.File file, string saveTo)
+        {
+            var request = service.Files.Get(file.Id);
+            var stream = new MemoryStream();
+
+            // Add a handler which will be notified on progress changes.
+            // It will notify on each chunk download and when the
+            // download is completed or failed.
+            request.MediaDownloader.ProgressChanged += (Google.Apis.Download.IDownloadProgress progress) =>
+            {
+                switch (progress.Status)
+                {
+                    case Google.Apis.Download.DownloadStatus.Downloading:
+                        {
+                            OutputArea.Text += (progress.BytesDownloaded);
+                            break;
+                        }
+                    case Google.Apis.Download.DownloadStatus.Completed:
+                        {
+                            OutputArea.Text += ("Download complete.");
+                            SaveStream(stream, saveTo);
+                            break;
+                        }
+                    case Google.Apis.Download.DownloadStatus.Failed:
+                        {
+                            OutputArea.Text += ("Download failed.");
+                            break;
+                        }
+                }
+            };
+            request.Download(stream);
+        }
+
+        private void SaveStream(MemoryStream stream, string saveTo)
+        {
+            using (FileStream file = new FileStream(saveTo, FileMode.Create, FileAccess.Write))
+            {
+                stream.WriteTo(file);
+            }
         }
 
         private void cleanUpEmptyFolders(string startLocation)
@@ -325,7 +423,7 @@ namespace LargeFileSync_GD
             string timeStamp = DateTime.Now.ToString("yyyyMMddThhmm");
             Console.WriteLine(timeStamp);
 
-            System.IO.FileInfo file = new System.IO.FileInfo(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json");
+            FileInfo file = new FileInfo(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json");
 
             Console.WriteLine(file);
 
@@ -337,18 +435,18 @@ namespace LargeFileSync_GD
 
                 string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
 
-                string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
+                string[] localFileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
 
                 string currentDir = Directory.GetCurrentDirectory();
 
-                foreach (string filePath in fileArray)
+                foreach (string localFilePath in localFileArray)
                 {
-                    string fileName = System.IO.Path.GetFileName(filePath);
-                    string relativePath = filePath.Substring(LargeDataFolderLocation.Length);
+                    string localFileName = System.IO.Path.GetFileName(localFilePath);
+                    string localFileRelativePath = localFilePath.Substring(LargeDataFolderLocation.Length);
 
                     Data data = new Data();
-                    data.fileName = fileName;
-                    data.filePath = relativePath;
+                    data.fileName = localFileName;
+                    data.filePath = localFileRelativePath;
                     metadata.data.Add(data);
                 }
 
@@ -375,6 +473,7 @@ namespace LargeFileSync_GD
             }
             else
             {
+                updateFileID();
                 updateMetaData(timeStamp);
                 string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTimeStampFile) + ".json \n";
                 msg = "metadata.json file updated";
@@ -382,9 +481,97 @@ namespace LargeFileSync_GD
             }
         }
 
+        private void updateFileID()
+        {
+            authenticate();
+            string pageToken = null;
+            OutputArea.Text += ("Google Drive Files:");
+            do
+            {
+                // Define parameters of request.
+                // Get root folder
+                FilesResource.ListRequest listRequest = service.Files.List();
+                listRequest.PageSize = 100;
+                listRequest.Fields = "nextPageToken, files(id, name)";
+                listRequest.PageToken = pageToken;
+
+                // List files.
+                var result = listRequest.Execute();
+                IList<Google.Apis.Drive.v3.Data.File> files = result.Files;
+
+                OutputArea.Text += ("Count:: " + result.Files.Count);
+
+                if (files != null && files.Count > 0)
+                {
+                    foreach (var file in files)
+                    {
+                        OutputArea.Text += ("Files:: " + file.Name + "\n");
+
+                        string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
+
+                        string[] localFileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
+                        
+                        foreach (string localFilePath in localFileArray)
+                        {
+                            string localFileName = System.IO.Path.GetFileName(localFilePath);
+
+                            //look for if there is a file in the gDrive same as file in local (eg. actualy file we need)
+                            //Then record its id in metaData
+                            if (file.Name == localFileName)
+                            {
+                                OutputArea.Text += ("Matched File Found:: " + file.Name + "\n");
+                                OutputArea.Text += ("Save ID:: " + file.Id + "\n");
+
+                                //get metadata
+                                string timeStampFileName = "";
+                                using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+                                {
+                                    string data = reader.ReadToEnd();
+                                    Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
+                                    timeStampFileName = metadata.currentVersion;
+                                }
+
+                                TimeStamp metaDataFiles;
+                                using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+                                {
+                                    string data = reader.ReadToEnd();
+                                    metaDataFiles = JsonConvert.DeserializeObject<TimeStamp>(data);
+
+                                    foreach(Data item in metaDataFiles.data)
+                                    {
+                                        if (item.fileName == localFileName)
+                                        {
+                                            item.fileId = file.Id;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+                                {
+
+                                    string newJson = JsonConvert.SerializeObject(metaDataFiles);
+                                    writer.Write(newJson);
+                                }
+
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("No files found.");
+                }
+                pageToken = result.NextPageToken;
+
+                OutputArea.Text += ("\n");
+            }
+            while (pageToken != null);
+        }
+
         private void updateMetaData(string timeStamp)
         {
-            System.IO.FileInfo file = new System.IO.FileInfo(txtMyContentFileLocation.Text + "\\LFS\\metadata.json");
+            FileInfo file = new FileInfo(txtMyContentFileLocation.Text + "\\LFS\\metadata.json");
             file.Directory.Create();
             using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
             {

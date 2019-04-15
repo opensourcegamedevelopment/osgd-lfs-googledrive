@@ -8,6 +8,7 @@ namespace LargeFileSync_GD
 {
     public class Data
     {
+        public string fileId { get; set; }
         public string fileName { get; set; }
         public string filePath { get; set; }
     }

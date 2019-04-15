@@ -258,14 +258,13 @@ namespace LargeFileSync_GD
                 Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
                 timeStampFileName = metadata.currentVersion;
             }
-            
 
+            //Delete Removed Files
+            string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
             using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
             {
                 string data = reader.ReadToEnd();
                 TimeStamp filesList = JsonConvert.DeserializeObject<TimeStamp>(data);
-                
-                string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
 
                 string[] fileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
 
@@ -297,17 +296,28 @@ namespace LargeFileSync_GD
             }
 
             
-
             //loop through each directory delete folder if empty
-            cleanUpEmptyFolders();
+            cleanUpEmptyFolders(LargeDataFolderLocation);
 
             //add all new assets
-            OutputArea.Text += "Done\n";
+
+
+            //Done
+            OutputArea.Text += "\nDone\n";
         }
 
-        private void cleanUpEmptyFolders()
+        private void cleanUpEmptyFolders(string startLocation)
         {
-
+            foreach (var directory in Directory.GetDirectories(startLocation))
+            {
+                cleanUpEmptyFolders(directory);
+                if (Directory.GetFiles(directory).Length == 0 &&
+                    Directory.GetDirectories(directory).Length == 0)
+                {
+                    Directory.Delete(directory, false);
+                    OutputArea.Text += "Empty Directory Deleted: " + directory + "\n";
+                }
+            }
         }
 
         private void createLocalFilesTimeStampData()

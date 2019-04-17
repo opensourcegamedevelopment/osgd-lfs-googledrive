@@ -256,13 +256,7 @@ namespace LargeFileSync_GD
             //readLocalFiles();
 
             //get metadata
-            string timeStampFileName = "";
-            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
-            {
-                string data = reader.ReadToEnd();
-                Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
-                timeStampFileName = metadata.currentVersion;
-            }
+            string timeStampFileName = getLatestTimeStampFileName();
 
             //Delete Removed Files
             string LargeDataFolderLocation = txtMyContentFileLocation.Text + "\\LargeData";
@@ -342,6 +336,7 @@ namespace LargeFileSync_GD
                         //download file
                         string saveToLocation = LargeDataFolderLocation + metaDataFile.filePath;
                         OutputArea.Text += "File will be Save to: " + saveToLocation + "\n";
+                        getFileFromGDrive(metaDataFile.fileName);
                         //Google.Apis.Drive.v3.Data.File gFile = getFileFromGDrive(metaDataFile.fileName);
                         //downloadFile(service, gFile, saveToLocation);
                     }
@@ -350,18 +345,40 @@ namespace LargeFileSync_GD
             }
         }
 
-        //private Google.Apis.Drive.v3.Data.File getFileFromGDrive(string fileName)
-        //{
-        //    FilesResource.ListRequest listRequest = service.Files.List();
-        //    listRequest.PageSize = 100;
-        //    listRequest.Fields = "nextPageToken, files(id, name)";
+        private void getFileFromGDrive(string fileName)
+        {
+            //get metadata
+            string timeStampFileName = getLatestTimeStampFileName();
 
-        //    // List files.
-        //    var result = listRequest.Execute();
-        //    IList<Google.Apis.Drive.v3.Data.File> files = result.Files;
+            string fileId = "";
+            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+            {
+                string data = reader.ReadToEnd();
+                TimeStamp metaDataFiles = JsonConvert.DeserializeObject<TimeStamp>(data);
 
-        //    return "";
-        //}
+                foreach (Data item in metaDataFiles.data)
+                {
+                    if (item.fileName == fileName)
+                    {
+                        fileId = item.fileId;
+                        OutputArea.Text += "Google timeStampFileName: " + timeStampFileName + "\n";
+                        OutputArea.Text += "Google fileName: " + item.fileName + "\n";
+                        OutputArea.Text += "Google File ID: " + item.fileId + "\n";
+                        break;
+                    }
+                }
+            }
+
+            //FilesResource.GetRequest getRequest = service.Files.Get(fileId);
+
+            //// List files.
+            //var result = getRequest.Execute();
+            //Google.Apis.Drive.v3.Data.File file = result;
+
+            //OutputArea.Text += "Google File: " + file.Name + "\n";
+
+            //return file;
+        }
 
         private void downloadFile(DriveService service, Google.Apis.Drive.v3.Data.File file, string saveTo)
         {
@@ -421,11 +438,11 @@ namespace LargeFileSync_GD
         private void createLocalFilesTimeStampData()
         {
             string timeStamp = DateTime.Now.ToString("yyyyMMddThhmm");
-            Console.WriteLine(timeStamp);
+            //Console.WriteLine(timeStamp);
 
             FileInfo file = new FileInfo(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json");
 
-            Console.WriteLine(file);
+            //Console.WriteLine(file);
 
             file.Directory.Create();
 
@@ -461,20 +478,25 @@ namespace LargeFileSync_GD
                 string data = reader.ReadToEnd();
                 Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
                 oldTimeStampFileName = metadata.currentVersion;
+                metadata.currentVersion = newTimeStampFile;
             }
+
+            OutputArea.Text += "oldTimeStampFileName: " + oldTimeStampFileName + "\n";
+            OutputArea.Text += "newTimeStampFile: " + oldTimeStampFileName + "\n";
 
             string oldTimeStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTimeStampFileName + ".json";
 
             
             if (FileEquals(newTimeStampFile, oldTimeStampFile))//check if the new file actually contain new data
             {
+                //if not delete the newly generated timestamp file
                 System.IO.File.Delete(newTimeStampFile);
                 MessageBox.Show("No New data");
             }
             else
             {
-                updateFileID();
                 updateMetaData(timeStamp);
+                updateFileID();
                 string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTimeStampFile) + ".json \n";
                 msg = "metadata.json file updated";
                 MessageBox.Show(msg);
@@ -503,6 +525,7 @@ namespace LargeFileSync_GD
 
                 if (files != null && files.Count > 0)
                 {
+                    //foreach file in google drive
                     foreach (var file in files)
                     {
                         OutputArea.Text += ("Files:: " + file.Name + "\n");
@@ -511,27 +534,24 @@ namespace LargeFileSync_GD
 
                         string[] localFileArray = Directory.GetFiles(LargeDataFolderLocation, "*", SearchOption.AllDirectories);
                         
+                        //foreach file in local
                         foreach (string localFilePath in localFileArray)
                         {
                             string localFileName = System.IO.Path.GetFileName(localFilePath);
 
                             //look for if there is a file in the gDrive same as file in local (eg. actualy file we need)
                             //Then record its id in metaData
+                            //if match
                             if (file.Name == localFileName)
                             {
                                 OutputArea.Text += ("Matched File Found:: " + file.Name + "\n");
                                 OutputArea.Text += ("Save ID:: " + file.Id + "\n");
 
                                 //get metadata
-                                string timeStampFileName = "";
-                                using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
-                                {
-                                    string data = reader.ReadToEnd();
-                                    Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
-                                    timeStampFileName = metadata.currentVersion;
-                                }
-
+                                string timeStampFileName = getLatestTimeStampFileName();
+                                
                                 TimeStamp metaDataFiles;
+                                bool updateData = false;
                                 using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
                                 {
                                     string data = reader.ReadToEnd();
@@ -542,20 +562,25 @@ namespace LargeFileSync_GD
                                         if (item.fileName == localFileName)
                                         {
                                             item.fileId = file.Id;
+                                            updateData = true;
                                             break;
                                         }
                                     }
                                 }
 
-                                using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+                                if (updateData)
                                 {
+                                    using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
+                                    {
 
-                                    string newJson = JsonConvert.SerializeObject(metaDataFiles);
-                                    writer.Write(newJson);
+                                        string newJson = JsonConvert.SerializeObject(metaDataFiles);
+                                        writer.Write(newJson);
+                                    }
                                 }
 
                             }
                         }
+                        
                     }
                 }
                 else
@@ -567,6 +592,19 @@ namespace LargeFileSync_GD
                 OutputArea.Text += ("\n");
             }
             while (pageToken != null);
+        }
+
+        private string getLatestTimeStampFileName()
+        {
+            string timeStampFileName = "";
+            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+            {
+                string data = reader.ReadToEnd();
+                Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
+                timeStampFileName = metadata.currentVersion;
+            }
+
+            return timeStampFileName;
         }
 
         private void updateMetaData(string timeStamp)

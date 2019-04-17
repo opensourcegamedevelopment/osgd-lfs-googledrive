@@ -337,15 +337,15 @@ namespace LargeFileSync_GD
                         string saveToLocation = LargeDataFolderLocation + metaDataFile.filePath;
                         OutputArea.Text += "File will be Save to: " + saveToLocation + "\n";
                         getFileFromGDrive(metaDataFile.fileName);
-                        //Google.Apis.Drive.v3.Data.File gFile = getFileFromGDrive(metaDataFile.fileName);
-                        //downloadFile(service, gFile, saveToLocation);
+                        Google.Apis.Drive.v3.Data.File gFile = getFileFromGDrive(metaDataFile.fileName);
+                        downloadFile(service, gFile, saveToLocation);
                     }
                 }
                 
             }
         }
 
-        private void getFileFromGDrive(string fileName)
+        private Google.Apis.Drive.v3.Data.File getFileFromGDrive(string fileName)
         {
             //get metadata
             string timeStampFileName = getLatestTimeStampFileName();
@@ -369,15 +369,21 @@ namespace LargeFileSync_GD
                 }
             }
 
-            //FilesResource.GetRequest getRequest = service.Files.Get(fileId);
+            // Create Drive API service.
+            service = new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
+            FilesResource.GetRequest getRequest = service.Files.Get(fileId);
 
-            //// List files.
-            //var result = getRequest.Execute();
-            //Google.Apis.Drive.v3.Data.File file = result;
+            // List files.
+            var result = getRequest.Execute();
+            Google.Apis.Drive.v3.Data.File file = result;
 
-            //OutputArea.Text += "Google File: " + file.Name + "\n";
+            OutputArea.Text += "Google File: " + file.Name + "\n";
 
-            //return file;
+            return file;
         }
 
         private void downloadFile(DriveService service, Google.Apis.Drive.v3.Data.File file, string saveTo)

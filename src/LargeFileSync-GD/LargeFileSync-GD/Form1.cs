@@ -33,10 +33,10 @@ namespace LargeFileSync_GD
 
         private UserCredential credential;
         private DriveService service;
-
-        private System.Timers.Timer aTimer;
+        
         long? fileSize;
         long? byteDownloaded;
+        long totalByteDownloaded;
 
         public Form1()
         {
@@ -194,9 +194,6 @@ namespace LargeFileSync_GD
                 listRequest.PageSize = 100;
                 listRequest.Fields = "nextPageToken, files(id, name)";
                 listRequest.PageToken = pageToken;
-                //listRequest.IncludeTeamDriveItems = true;
-                //listRequest.SupportsTeamDrives = true;
-                //listRequest.Q = "sharedWithMe=true";
 
                 // List files.
                 var result = listRequest.Execute();
@@ -403,28 +400,13 @@ namespace LargeFileSync_GD
             var request = service.Files.Get(file.Id);
             request.Fields = "size"; 
             var stream = new MemoryStream();
-
-            // Create a timer and set a two second interval.
-            //aTimer = new System.Timers.Timer();
-            //aTimer.Interval = 1000;
-
-            //// Hook up the Elapsed event for the timer. 
-            //aTimer.Elapsed += OnTimedEvent;
-
-            //// Have the timer fire repeated events (true is the default)
-            //aTimer.AutoReset = true;
-
-            //// Start the timer
-            //aTimer.Enabled = true;
-
-            //backgroundWorker1.WorkerReportsProgress = true;
-            //backgroundWorker1.WorkerSupportsCancellation = true;
+            
 
             var result = request.Execute();
             fileSize = result.Size;
-            //Console.WriteLine("fileSIze: " + fileSize);
+            Console.WriteLine("total file size: " + fileSize);
+            totalByteDownloaded = 0;
 
-            
 
             // Add a handler which will be notified on progress changes.
             // It will notify on each chunk download and when the
@@ -435,24 +417,14 @@ namespace LargeFileSync_GD
                 {
                     case Google.Apis.Download.DownloadStatus.Downloading:
                         {
-                            //DownloadProgressBar.Value = (int) Math.Round((double) (progress.BytesDownloaded / file.Size));
-                            //OutputArea.Text += (progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB";
-                            //Console.WriteLine((progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB");
                             byteDownloaded = progress.BytesDownloaded;
+                            totalByteDownloaded += progress.BytesDownloaded;
                             
-                            int progressInt = (int)Math.Round((double)(progress.BytesDownloaded / fileSize));
+                            int progressInt = Convert.ToInt32(Math.Floor(totalByteDownloaded / (double)fileSize) * 100) ;
+                            setProgress(progressInt);
                             Console.WriteLine(progress.BytesDownloaded);
-                            //setProgress(progressInt);
-                            //SetText(LblDownloadProgress, progress.BytesDownloaded.ToString());
-                            //OutputArea.Text = progress.BytesDownloaded.ToString();
-                            //OutputArea.Invoke(OutputArea => OutputArea.Text = progress.BytesDownloaded.ToString());
-                            // UpdateProgres(progress.BytesDownloaded);
-
-                            //  DownloadProgressBar.Invoke(DownloadProgressBar => DownloadProgressBar.Value = progressInt);
-                            //var text = (progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB";
-
-                            //OutputArea.Invoke(new Action(() => OutputArea.Text = "test"));
-                            //Invoke(new Action(() => OutputArea.Text = progress.BytesDownloaded.ToString()));
+                            Console.WriteLine(progressInt);
+                            
                             break;
                         }
                     case Google.Apis.Download.DownloadStatus.Completed:
@@ -468,71 +440,20 @@ namespace LargeFileSync_GD
                         }
                 }
             };
-            request.Download(stream);
-
+            request.DownloadAsync(stream);
             
         }
-
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
-        {
-            for (int i = 1; i <= 100; i++)
-            {
-                // Wait 100 milliseconds.
-                Thread.Sleep(100);
-                // Report progress.
-                backgroundWorker1.ReportProgress(i);
-            }
-        }
-
-        private void backgroundWorker1_ProgressChanged(object sender,
-            ProgressChangedEventArgs e)
-        {
-            // Change the value of the ProgressBar to the BackgroundWorker progress.
-            DownloadProgressBar.Value = e.ProgressPercentage;
-            // Set the text.
-            Console.WriteLine(e.ProgressPercentage.ToString());
-        }
+        
 
         public void setProgress(int value)
         {
-            DownloadProgressBar.Invoke(new Action(() => DownloadProgressBar.Value = value));
-        }
-
-        public delegate void ControlStringConsumer(Control control, string text);  // defines a delegate type
-
-        public void SetText(Control control, string text)
-        {
-            if (control.InvokeRequired)
+            if (value <= 100)
             {
-                //control.Invoke(new ControlStringConsumer(SetText), new object[] { control, text });  // invoking itself
-            }
-            else
-            {
-                control.Text = text;      // the "functional part", executing only on the main thread
+                DownloadProgressBar.Invoke(new Action(() => DownloadProgressBar.Value = value));
+                LblDownloadProgress.Invoke(new Action(() => LblDownloadProgress.Text = totalByteDownloaded + " kb / " + fileSize + "kB"));
             }
         }
-
-        public void UpdateProgres(double _value)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action<double>(UpdateProgres), _value);
-                //Invoke((MethodInvoker)delegate { OutputArea.Text += _value; });
-                return;
-            }
-
-            //ProgressBar bar = new ProgressBar();
-            //bar.Value = _value;
-            //DownloadProgressBar.Value = _value;
-            OutputArea.Text = _value.ToString();
-        }
-
-        private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
-        {
-            var text = (byteDownloaded / 1000) + "kB";
-            //LblDownloadProgress.Text = text;
-            //LblDownloadProgress.Invoke(new Action(() => LblDownloadProgress.Text = text));
-        }
+        
 
         private void SaveStream(MemoryStream stream, string saveTo)
         {

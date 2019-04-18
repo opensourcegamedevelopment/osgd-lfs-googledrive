@@ -34,6 +34,10 @@ namespace LargeFileSync_GD
         private UserCredential credential;
         private DriveService service;
 
+        private System.Timers.Timer aTimer;
+        long? fileSize;
+        long? byteDownloaded;
+
         public Form1()
         {
             InitializeComponent();
@@ -305,6 +309,8 @@ namespace LargeFileSync_GD
             OutputArea.Text += "\nDone\n";
         }
 
+
+
         private void syncNewFiles(string LargeDataFolderLocation, string timeStampFileName)
         {
             using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
@@ -344,6 +350,7 @@ namespace LargeFileSync_GD
                 
             }
         }
+        
 
         private Google.Apis.Drive.v3.Data.File getFileFromGDrive(string fileName)
         {
@@ -369,6 +376,8 @@ namespace LargeFileSync_GD
                 }
             }
 
+
+            authenticate();
             // Create Drive API service.
             service = new DriveService(new BaseClientService.Initializer()
             {
@@ -391,6 +400,21 @@ namespace LargeFileSync_GD
             var request = service.Files.Get(file.Id);
             var stream = new MemoryStream();
 
+            //// Create a timer and set a two second interval.
+            //aTimer = new System.Timers.Timer();
+            //aTimer.Interval = 1000;
+
+            //// Hook up the Elapsed event for the timer. 
+            //aTimer.Elapsed += OnTimedEvent;
+
+            //// Have the timer fire repeated events (true is the default)
+            //aTimer.AutoReset = true;
+
+            //// Start the timer
+            //aTimer.Enabled = true;
+
+            fileSize = file.Size;
+
             // Add a handler which will be notified on progress changes.
             // It will notify on each chunk download and when the
             // download is completed or failed.
@@ -400,24 +424,59 @@ namespace LargeFileSync_GD
                 {
                     case Google.Apis.Download.DownloadStatus.Downloading:
                         {
-                            OutputArea.Text += (progress.BytesDownloaded);
+                            //DownloadProgressBar.Value = (int) Math.Round((double) (progress.BytesDownloaded / file.Size));
+                            //OutputArea.Text += (progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB";
+                            //Console.WriteLine((progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB");
+                            byteDownloaded = progress.BytesDownloaded;
+
+                            if (file.Size is null == false)
+                            {
+                                int progressInt = (int)Math.Round((double)(progress.BytesDownloaded / file.Size));
+                                Console.WriteLine(progressInt);
+                               UpdateProgres(progressInt);
+                            }
+                            //var text = (progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB";
+                            //LblDownloadProgress.Invoke(new Action(() => LblDownloadProgress.Text = text));
+                            //OutputArea.Invoke(new Action(() => OutputArea.Text = "test"));
+                            //Invoke(new Action(() => LblDownloadProgress.Text = "Text"));
                             break;
                         }
                     case Google.Apis.Download.DownloadStatus.Completed:
                         {
-                            OutputArea.Text += ("Download complete.");
+                            Console.WriteLine("Download complete.");
                             SaveStream(stream, saveTo);
                             break;
                         }
                     case Google.Apis.Download.DownloadStatus.Failed:
                         {
-                            OutputArea.Text += ("Download failed.");
+                            Console.WriteLine("Download failed.");
                             break;
                         }
                 }
             };
             request.Download(stream);
         }
+
+        public void UpdateProgres(int _value)
+        {
+            if (InvokeRequired)
+            {
+                //Invoke(new Action<int>(UpdateProgres), _value);
+                Invoke((MethodInvoker)delegate { DownloadProgressBar.Value = _value; });
+                return;
+            }
+
+            //ProgressBar bar = new ProgressBar();
+            //bar.Value = _value;
+            //DownloadProgressBar.Value = _value;
+        }
+
+        //private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        //{
+        //    var text = (byteDownloaded / 1000) + "kB/" + (fileSize / 1000) + "kB";
+        //    LblDownloadProgress.Text = text;
+        //    LblDownloadProgress.Invoke(new Action(() => LblDownloadProgress.Text = text));
+        //}
 
         private void SaveStream(MemoryStream stream, string saveTo)
         {

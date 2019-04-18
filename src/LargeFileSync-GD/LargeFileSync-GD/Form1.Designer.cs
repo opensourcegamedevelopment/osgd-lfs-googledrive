@@ -40,6 +40,9 @@
             this.label3 = new System.Windows.Forms.Label();
             this.btnGenerateMetaData = new System.Windows.Forms.Button();
             this.OutputArea = new System.Windows.Forms.RichTextBox();
+            this.DownloadProgressBar = new System.Windows.Forms.ProgressBar();
+            this.label4 = new System.Windows.Forms.Label();
+            this.LblDownloadProgress = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -159,11 +162,39 @@
             this.OutputArea.TabIndex = 13;
             this.OutputArea.Text = "";
             // 
+            // DownloadProgressBar
+            // 
+            this.DownloadProgressBar.Location = new System.Drawing.Point(12, 409);
+            this.DownloadProgressBar.Name = "DownloadProgressBar";
+            this.DownloadProgressBar.Size = new System.Drawing.Size(627, 23);
+            this.DownloadProgressBar.TabIndex = 14;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 387);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(75, 13);
+            this.label4.TabIndex = 15;
+            this.label4.Text = "Downloading: ";
+            // 
+            // LblDownloadProgress
+            // 
+            this.LblDownloadProgress.AutoSize = true;
+            this.LblDownloadProgress.Location = new System.Drawing.Point(83, 387);
+            this.LblDownloadProgress.Name = "LblDownloadProgress";
+            this.LblDownloadProgress.Size = new System.Drawing.Size(33, 13);
+            this.LblDownloadProgress.TabIndex = 16;
+            this.LblDownloadProgress.Text = "None";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(651, 392);
+            this.ClientSize = new System.Drawing.Size(651, 444);
+            this.Controls.Add(this.LblDownloadProgress);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.DownloadProgressBar);
             this.Controls.Add(this.OutputArea);
             this.Controls.Add(this.btnGenerateMetaData);
             this.Controls.Add(this.btnSyncFiles);
@@ -176,6 +207,7 @@
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -192,6 +224,9 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnGenerateMetaData;
         private System.Windows.Forms.RichTextBox OutputArea;
+        private System.Windows.Forms.ProgressBar DownloadProgressBar;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label LblDownloadProgress;
     }
 }
 

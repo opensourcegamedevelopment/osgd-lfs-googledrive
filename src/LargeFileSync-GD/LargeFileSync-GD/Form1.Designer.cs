@@ -43,6 +43,7 @@
             this.DownloadProgressBar = new System.Windows.Forms.ProgressBar();
             this.label4 = new System.Windows.Forms.Label();
             this.LblDownloadProgress = new System.Windows.Forms.Label();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -187,6 +188,11 @@
             this.LblDownloadProgress.TabIndex = 16;
             this.LblDownloadProgress.Text = "None";
             // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.WorkerSupportsCancellation = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -227,6 +233,7 @@
         private System.Windows.Forms.ProgressBar DownloadProgressBar;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label LblDownloadProgress;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

@@ -147,6 +147,7 @@ namespace LargeFileSync_GD
                     client_secret = credentialObject.installed.client_secret;
                 }
             }
+
             backgroundWorker1.RunWorkerAsync();
         }
 
@@ -485,7 +486,7 @@ namespace LargeFileSync_GD
             // Change the value of the ProgressBar to the BackgroundWorker progress.
             DownloadProgressBar.Value = e.ProgressPercentage;
             // Set the text.
-            this.Text = e.ProgressPercentage.ToString();
+            Console.WriteLine(e.ProgressPercentage.ToString());
         }
 
         public delegate void ControlStringConsumer(Control control, string text);  // defines a delegate type
@@ -584,33 +585,49 @@ namespace LargeFileSync_GD
 
             string newTimeStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStamp + ".json";
             string oldTimeStampFileName = "";
-            using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+
+            if (System.IO.File.Exists(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
             {
-                string data = reader.ReadToEnd();
-                Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
-                oldTimeStampFileName = metadata.currentVersion;
-                metadata.currentVersion = newTimeStampFile;
-            }
 
-            OutputArea.Text += "oldTimeStampFileName: " + oldTimeStampFileName + "\n";
-            OutputArea.Text += "newTimeStampFile: " + oldTimeStampFileName + "\n";
+                using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+                {
+                    string data = reader.ReadToEnd();
+                    Metadata metadata = JsonConvert.DeserializeObject<Metadata>(data);
+                    oldTimeStampFileName = metadata.currentVersion;
+                    metadata.currentVersion = newTimeStampFile;
+                }
 
-            string oldTimeStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTimeStampFileName + ".json";
+                OutputArea.Text += "oldTimeStampFileName: " + oldTimeStampFileName + "\n";
+                OutputArea.Text += "newTimeStampFile: " + oldTimeStampFileName + "\n";
 
-            
-            if (FileEquals(newTimeStampFile, oldTimeStampFile))//check if the new file actually contain new data
-            {
-                //if not delete the newly generated timestamp file
-                System.IO.File.Delete(newTimeStampFile);
-                MessageBox.Show("No New data");
+                string oldTimeStampFile = txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + oldTimeStampFileName + ".json";
+
+
+                if (FileEquals(newTimeStampFile, oldTimeStampFile))//check if the new file actually contain new data
+                {
+                    //if not delete the newly generated timestamp file
+                    System.IO.File.Delete(newTimeStampFile);
+                    MessageBox.Show("No New data");
+                }
+                else
+                {
+                    updateMetaData(timeStamp);
+                    updateFileID();
+                    string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTimeStampFile) + ".json \n";
+                    msg = "metadata.json file updated";
+                    MessageBox.Show(msg);
+                }
             }
             else
             {
-                updateMetaData(timeStamp);
-                updateFileID();
-                string msg = "New timestamp.json added: " + System.IO.Path.GetFileName(newTimeStampFile) + ".json \n";
-                msg = "metadata.json file updated";
-                MessageBox.Show(msg);
+                using (StreamWriter writer = new StreamWriter(txtMyContentFileLocation.Text + "\\LFS\\metadata.json"))
+                {
+
+                    Metadata metadata = new Metadata();
+                    metadata.currentVersion = timeStamp;
+                    string newJson = JsonConvert.SerializeObject(metadata);
+                    writer.Write(newJson);
+                }
             }
         }
 

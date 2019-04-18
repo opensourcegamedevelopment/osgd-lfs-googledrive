@@ -309,6 +309,7 @@ namespace LargeFileSync_GD
 
             //Done
             OutputArea.Text += "\nDone\n";
+            
         }
 
 
@@ -400,6 +401,7 @@ namespace LargeFileSync_GD
         private void downloadFile(DriveService service, Google.Apis.Drive.v3.Data.File file, string saveTo)
         {
             var request = service.Files.Get(file.Id);
+            request.Fields = "size"; 
             var stream = new MemoryStream();
 
             // Create a timer and set a two second interval.
@@ -418,8 +420,9 @@ namespace LargeFileSync_GD
             //backgroundWorker1.WorkerReportsProgress = true;
             //backgroundWorker1.WorkerSupportsCancellation = true;
 
-            fileSize = file.Size;
-            Console.WriteLine("fileSIze: " + fileSize);
+            var result = request.Execute();
+            fileSize = result.Size;
+            //Console.WriteLine("fileSIze: " + fileSize);
 
             
 
@@ -437,8 +440,9 @@ namespace LargeFileSync_GD
                             //Console.WriteLine((progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB");
                             byteDownloaded = progress.BytesDownloaded;
                             
-                                int progressInt = (int)Math.Round((double)(progress.BytesDownloaded / 1000));
-                                Console.WriteLine(progress.BytesDownloaded);
+                            int progressInt = (int)Math.Round((double)(progress.BytesDownloaded / fileSize));
+                            Console.WriteLine(progress.BytesDownloaded);
+                            //setProgress(progressInt);
                             //SetText(LblDownloadProgress, progress.BytesDownloaded.ToString());
                             //OutputArea.Text = progress.BytesDownloaded.ToString();
                             //OutputArea.Invoke(OutputArea => OutputArea.Text = progress.BytesDownloaded.ToString());
@@ -446,7 +450,7 @@ namespace LargeFileSync_GD
 
                             //  DownloadProgressBar.Invoke(DownloadProgressBar => DownloadProgressBar.Value = progressInt);
                             //var text = (progress.BytesDownloaded / 1000) + "kB/" + (file.Size / 1000) + "kB";
-                            
+
                             //OutputArea.Invoke(new Action(() => OutputArea.Text = "test"));
                             //Invoke(new Action(() => OutputArea.Text = progress.BytesDownloaded.ToString()));
                             break;
@@ -487,6 +491,11 @@ namespace LargeFileSync_GD
             DownloadProgressBar.Value = e.ProgressPercentage;
             // Set the text.
             Console.WriteLine(e.ProgressPercentage.ToString());
+        }
+
+        public void setProgress(int value)
+        {
+            DownloadProgressBar.Invoke(new Action(() => DownloadProgressBar.Value = value));
         }
 
         public delegate void ControlStringConsumer(Control control, string text);  // defines a delegate type
@@ -634,6 +643,12 @@ namespace LargeFileSync_GD
         private void updateFileID()
         {
             authenticate();
+            // Create Drive API service.
+            service = new DriveService(new BaseClientService.Initializer()
+            {
+                HttpClientInitializer = credential,
+                ApplicationName = ApplicationName,
+            });
             string pageToken = null;
             OutputArea.Text += ("Google Drive Files:");
             do

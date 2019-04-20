@@ -55,12 +55,12 @@ namespace LargeFileSync_GD
         }
         public void updateTxtClientSecret(string new_text)
         {
-            ContentFolderLocation = new_text;
+            client_secret = new_text;
         }
         public void updateTxtContentFolderLocation(string new_text)
         {
             txtMyContentFileLocation.Text = new_text;
-            project_id = new_text;
+            ContentFolderLocation = new_text;
         }
         public void updateTxtProjectName(string new_text)
         {
@@ -71,6 +71,12 @@ namespace LargeFileSync_GD
 
         private void Form1_Load(object sender, EventArgs e)
         {
+#if !BEBUG
+            btnGenerateMetaData.Visible = false;
+            btnSyncFiles.Height = 147;
+#endif
+
+
             if (!System.IO.File.Exists("ContentFolderLocation.txt"))
             {
                 using (StreamWriter sw = System.IO.File.CreateText("ContentFolderLocation.txt"))
@@ -323,6 +329,8 @@ namespace LargeFileSync_GD
 
                 //loop through metadata and check if current directory contain the file. If not, Download
                 OutputArea.Text += "Searching for files to download\n\n";
+
+                int filesDownloaded = 0;
                 foreach (Data metaDataFile in metaDataFiles.data)
                 {
                     bool fileFound = false;
@@ -341,13 +349,27 @@ namespace LargeFileSync_GD
                         OutputArea.Text += "File Not Found: " + metaDataFile.filePath + "\n";
                         //download file
                         string saveToLocation = LargeDataFolderLocation + metaDataFile.filePath;
+
+                        FileInfo file = new FileInfo(saveToLocation);
+                        
+                        file.Directory.Create();
+
                         OutputArea.Text += "File will be Save to: " + saveToLocation + "\n";
                         getFileFromGDrive(metaDataFile.fileName);
                         Google.Apis.Drive.v3.Data.File gFile = getFileFromGDrive(metaDataFile.fileName);
                         downloadFile(service, gFile, saveToLocation);
+                        filesDownloaded++;
                     }
                 }
-                
+
+                if (filesDownloaded == 0)
+                {
+                    OutputArea.Text += "No New Files needed to download \n";
+                }
+                else
+                {
+                    OutputArea.Text += "Total Files Downloaded: " + filesDownloaded + "\n";
+                }
             }
         }
         
@@ -356,6 +378,7 @@ namespace LargeFileSync_GD
         {
             //get metadata
             string timeStampFileName = getLatestTimeStampFileName();
+            OutputArea.Text += "Google timeStampFileName: " + timeStampFileName + "\n";
 
             string fileId = "";
             using (StreamReader reader = new StreamReader(txtMyContentFileLocation.Text + "\\LFS\\timestamps\\" + timeStampFileName + ".json"))
@@ -368,7 +391,6 @@ namespace LargeFileSync_GD
                     if (item.fileName == fileName)
                     {
                         fileId = item.fileId;
-                        OutputArea.Text += "Google timeStampFileName: " + timeStampFileName + "\n";
                         OutputArea.Text += "Google fileName: " + item.fileName + "\n";
                         OutputArea.Text += "Google File ID: " + item.fileId + "\n";
                         break;
@@ -390,7 +412,7 @@ namespace LargeFileSync_GD
             var result = getRequest.Execute();
             Google.Apis.Drive.v3.Data.File file = result;
 
-            OutputArea.Text += "Google File: " + file.Name + "\n";
+            OutputArea.Text += "Google File: " + file.Name + "\n\n";
 
             return file;
         }
@@ -419,8 +441,9 @@ namespace LargeFileSync_GD
                         {
                             byteDownloaded = progress.BytesDownloaded;
                             totalByteDownloaded += progress.BytesDownloaded;
-                            
-                            int progressInt = Convert.ToInt32(Math.Floor(totalByteDownloaded / (double)fileSize) * 100) ;
+
+                            double roundedProgress = Math.Round((totalByteDownloaded / (double)fileSize),3);
+                            int progressInt = Convert.ToInt32(roundedProgress * 100) ;
                             setProgress(progressInt);
                             Console.WriteLine(progress.BytesDownloaded);
                             Console.WriteLine(progressInt);
@@ -688,9 +711,7 @@ namespace LargeFileSync_GD
         {
 #if DEBUG
             createLocalFilesTimeStampData();
-#endif
-
-#if RELEASE
+#else
             MessageBox.Show("Available for Debug Mode Only - For ppl that know what this is doing!");
 #endif
 
@@ -729,6 +750,7 @@ namespace LargeFileSync_GD
         {
             if (correctSettings())
             {
+                OutputArea.Text = "";
                 syncData();
             }
         }

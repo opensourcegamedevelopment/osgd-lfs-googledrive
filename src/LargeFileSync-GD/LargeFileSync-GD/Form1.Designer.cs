@@ -100,7 +100,7 @@
             this.txtProjectID.Location = new System.Drawing.Point(148, 14);
             this.txtProjectID.Name = "txtProjectID";
             this.txtProjectID.ReadOnly = true;
-            this.txtProjectID.Size = new System.Drawing.Size(249, 20);
+            this.txtProjectID.Size = new System.Drawing.Size(272, 20);
             this.txtProjectID.TabIndex = 6;
             // 
             // txtMyContentFileLocation
@@ -108,7 +108,7 @@
             this.txtMyContentFileLocation.Location = new System.Drawing.Point(148, 69);
             this.txtMyContentFileLocation.Name = "txtMyContentFileLocation";
             this.txtMyContentFileLocation.ReadOnly = true;
-            this.txtMyContentFileLocation.Size = new System.Drawing.Size(249, 20);
+            this.txtMyContentFileLocation.Size = new System.Drawing.Size(272, 20);
             this.txtMyContentFileLocation.TabIndex = 7;
             // 
             // panel1
@@ -129,7 +129,7 @@
             this.txtProjectName.Location = new System.Drawing.Point(148, 40);
             this.txtProjectName.Name = "txtProjectName";
             this.txtProjectName.ReadOnly = true;
-            this.txtProjectName.Size = new System.Drawing.Size(249, 20);
+            this.txtProjectName.Size = new System.Drawing.Size(272, 20);
             this.txtProjectName.TabIndex = 9;
             // 
             // label3

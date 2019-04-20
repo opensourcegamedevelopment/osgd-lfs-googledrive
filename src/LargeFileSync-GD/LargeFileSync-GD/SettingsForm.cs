@@ -24,14 +24,16 @@ namespace LargeFileSync_GD
         {
             string[] lines = { txtMyContentFileLocation.Text };
             File.WriteAllLines(@"ContentFolderLocation.txt", lines);
-            this.Close();
+            
 
             string[] lines2 = { txtProjectName.Text };
             File.WriteAllLines(@"ProjectName.txt", lines2);
-            this.Close();
+            
 
             frm1.updateTxtContentFolderLocation(lines[0]);
             frm1.updateTxtProjectName(lines2[0]);
+
+            this.Close();
         }
 
         private void SettingsForm_Load(object sender, EventArgs e)

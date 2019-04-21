@@ -36,8 +36,8 @@ The first time you run the app, it will prompt you to authorize access to your g
 3. Click the Accept button.
 The app will proceed automatically, and you may close the window/tab.
 
-Note: you will need to accept and hit the the share folder provided to you by project admin atleast once for this syncing to work. 
-Note2: Because of the way google drive folder structure works. All files use for this syncing mechanic MUST have unique filenames.
+#### Note: you will need to accept and hit the the share folder provided to you by project admin atleast once for this syncing to work. 
+#### Note2: Because of the way google drive folder structure works. All files use for this syncing mechanic MUST have unique filenames.
 
 # remix project
 If you are remixing this project for your own, make sure you update credentials.json with your own app.

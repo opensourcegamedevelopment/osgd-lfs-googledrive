@@ -71,15 +71,18 @@ namespace LargeFileSync_GD
 
         private void Form1_Load(object sender, EventArgs e)
         {
-#if !BEBUG
+#if !DEBUG
             btnGenerateMetaData.Visible = false;
             btnSyncFiles.Height = 147;
 #endif
+            
 
-
-            if (!System.IO.File.Exists("ContentFolderLocation.txt"))
+            if (!System.IO.File.Exists("data/ContentFolderLocation.txt"))
             {
-                using (StreamWriter sw = System.IO.File.CreateText("ContentFolderLocation.txt"))
+                FileInfo file = new FileInfo("data/ContentFolderLocation.txt");
+                file.Directory.Create();
+
+                using (StreamWriter sw = System.IO.File.CreateText("data/ContentFolderLocation.txt"))
                 {
                     string blankFile = "";
                     sw.WriteLine(blankFile);
@@ -88,16 +91,16 @@ namespace LargeFileSync_GD
             }
             else
             {
-                using (StreamReader r = new StreamReader("ContentFolderLocation.txt"))
+                using (StreamReader r = new StreamReader("data/ContentFolderLocation.txt"))
                 {
                     ContentFolderLocation = r.ReadLine();
                     txtProjectName.Text = ContentFolderLocation;
                 }
             }
 
-            if (!System.IO.File.Exists("ProjectName.txt"))
+            if (!System.IO.File.Exists("data/ProjectName.txt"))
             {
-                using (StreamWriter sw = System.IO.File.CreateText("ProjectName.txt"))
+                using (StreamWriter sw = System.IO.File.CreateText("data/ProjectName.txt"))
                 {
                     string blankFile = "";
                     sw.WriteLine(blankFile);
@@ -106,18 +109,18 @@ namespace LargeFileSync_GD
             }
             else
             {
-                using (StreamReader r = new StreamReader("ProjectName.txt"))
+                using (StreamReader r = new StreamReader("data/ProjectName.txt"))
                 {
                     ProjectName = r.ReadLine();
                     txtProjectName.Text = ProjectName;
                 }
             }
 
-            txtMyContentFileLocation.Text = System.IO.File.ReadAllLines(@"ContentFolderLocation.txt")[0];
+            txtMyContentFileLocation.Text = System.IO.File.ReadAllLines(@"data/ContentFolderLocation.txt")[0];
 
-            if (!System.IO.File.Exists("credentials.json"))
+            if (!System.IO.File.Exists("data/credentials.json"))
             {
-                using (StreamWriter sw = System.IO.File.CreateText("credentials.json"))
+                using (StreamWriter sw = System.IO.File.CreateText("data/credentials.json"))
                 {
                     string blankJSON = "{\"installed\": {\"client_id\": \"\",\"project_id\": \"\",\"auth_uri\": \"\",\"token_uri\": \"\",\"auth_provider_x509_cert_url\": \"\",\"client_secret\": \"\",\"redirect_uris\": [ \"\", \"\"]}}";
                     sw.WriteLine(blankJSON);
@@ -126,13 +129,13 @@ namespace LargeFileSync_GD
             }
             else
             {
-                using (StreamReader r = new StreamReader("ContentFolderLocation.txt"))
+                using (StreamReader r = new StreamReader("data/ContentFolderLocation.txt"))
                 {
                     ContentFolderLocation = r.ReadLine();
                 }
             }
 
-            using (StreamReader r = new StreamReader("credentials.json"))
+            using (StreamReader r = new StreamReader("data/credentials.json"))
             {
                 string json = r.ReadToEnd();
                 RootObject credentialObject = JsonConvert.DeserializeObject<RootObject>(json);
@@ -160,7 +163,7 @@ namespace LargeFileSync_GD
         private void authenticate()
         {
             using (var stream =
-                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
+                new FileStream("data/credentials.json", FileMode.Open, FileAccess.Read))
             {
                 // The file token.json stores the user's access and refresh tokens, and is created
                 // automatically when the authorization flow completes for the first time.
@@ -217,9 +220,6 @@ namespace LargeFileSync_GD
                         {
                             fileName = file.Name.Substring(0, ProjectName.Length);
                         }
-                        //Console.WriteLine("name: " + fileName);
-
-                       // Console.WriteLine("{0} ({1})", file.Name, file.Id);
 
                         if (fileName == ProjectName)
                         {

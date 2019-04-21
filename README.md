@@ -5,7 +5,9 @@ Custom Large File Sync for Google Drive
 This application is created for projectMMW (https://github.com/opensourcegamedevelopment/ProjectMMW-UE) to sync Large file assets from google drive. It is Open-Source and under MIT license so feel free to remix for you own uses. 
 
 #configuration
-
+1. Open LargeFileSync-GD.exe
+![Image of Yaktocat](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step1.PNG)
+2. 
 
 #remix project
 If you are remixing this project for your own, make sure you update credentials.json with your own app.

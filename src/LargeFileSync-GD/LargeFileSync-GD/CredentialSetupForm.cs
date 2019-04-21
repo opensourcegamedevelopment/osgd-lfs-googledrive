@@ -22,37 +22,11 @@ namespace LargeFileSync_GD
         {
             frm1.updateTxtProjectID(projectid);
             this.Close();
-            /*
-            if (txtProjectID.Text == "")
-            {
-                MessageBox.Show("Please Enter Project ID");
-            }
-            else if (txtClientID.Text == "")
-            {
-                MessageBox.Show("Please Enter Clicen ID");
-            }
-            else if (txtClientSecret.Text == "")
-            {
-                MessageBox.Show("Please Enter Clicen Secret");
-            }
-            else
-            {
-                credential.installed.project_id = txtProjectID.Text;
-                credential.installed.client_id = txtClientID.Text;
-                credential.installed.client_secret = txtClientSecret.Text;
-                    
-                using (StreamWriter streamWriter = new StreamWriter("credentials.json"))
-                {
-                    string newJson = JsonConvert.SerializeObject(credential);
-                    streamWriter.Write(newJson);
-                }
-                this.Close();
-            }*/
         }
 
         private void CredentialSetupForm_Load(object sender, EventArgs e)
         {
-            using (StreamReader r = new StreamReader("credentials.json"))
+            using (StreamReader r = new StreamReader("data/credentials.json"))
             {
                 string json = r.ReadToEnd();
                 credential = JsonConvert.DeserializeObject<RootObject>(json);
@@ -83,9 +57,9 @@ namespace LargeFileSync_GD
             {
                 string fileName = openFileDialog1.FileName;
                 Console.WriteLine(fileName);
-                File.Copy(fileName, "credentials.json",true);
+                File.Copy(fileName, "data/credentials.json",true);
 
-                using (StreamReader r = new StreamReader("credentials.json"))
+                using (StreamReader r = new StreamReader("data/credentials.json"))
                 {
                     string json = r.ReadToEnd();
                     credential = JsonConvert.DeserializeObject<RootObject>(json);
@@ -93,6 +67,10 @@ namespace LargeFileSync_GD
                     txtProjectID.Text = credential.installed.project_id;
                     txtClientSecret.Text = credential.installed.client_secret;
                     projectid = credential.installed.project_id;
+
+                    frm1.updateTxtClientID(txtClientID.Text);
+                    frm1.updateTxtProjectID(txtProjectID.Text);
+                    frm1.updateTxtClientSecret(txtClientSecret.Text);
                 }
             }
         }

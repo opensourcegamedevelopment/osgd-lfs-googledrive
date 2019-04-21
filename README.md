@@ -6,8 +6,24 @@ This application is created for projectMMW (https://github.com/opensourcegamedev
 
 #configuration
 1. Open LargeFileSync-GD.exe
-![Image of Yaktocat](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step1.PNG)
-2. 
+![Image of step1](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step1.PNG)
+
+2.On first time loading a popup for CredentialSetup will appear, simply click on the button to load the credentials.json file provided by your Project Admin. (This is the credential file for google drive).
+![Image of step2](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step2.PNG)
+
+3. When loading for the first time, you will also need to setup projectName as well as content file location. Simple click on the settings button and add the corresponding information.
+![Image of step3](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step3.PNG)
+
+4.Content file location is the path to the content directory of the Project's Content folder (For UE4). If you are using and working on a unity3D project you can do the same to navigate to the asset folder. 
+
+5. Project Name is the name of the root project folder in the share google drive which is used to store the projects's large data asset files. 
+
+6. Once done (if the project is configured correctly), simply click on Sync Content files button to automatically download the required content files. 
+
+## Note: This will only work for project that is setup correctly to uses lfs, for more information contact me on zerokiri or on our Discord channel at: https://discord.gg/A2tnTSH
+
+#Syncing workflow
+Once setup completed, for future workflow. Simply switch project branch to the branch you are working on. Then open this lfs-gd app and click sync content files.
 
 #remix project
 If you are remixing this project for your own, make sure you update credentials.json with your own app.

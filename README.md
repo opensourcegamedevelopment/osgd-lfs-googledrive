@@ -39,5 +39,23 @@ The app will proceed automatically, and you may close the window/tab.
 #### Note: you will need to accept and hit the the share folder provided to you by project admin atleast once for this syncing to work. 
 #### Note2: Because of the way google drive folder structure works. All files use for this syncing mechanic MUST have unique filenames.
 
+# Adding New Large Asset Data Files (Project Admin Use only)
+Adding new Large Asset Data files should be done by Project Admin only (For those that know what they are doing) as to prevent breaking the whole syncing process. I had setup so that this can only be done using the debug version of this app try prevent users accidently breaking the syncing.
+
+The step are actually quite simple:
+
+1. Downlaod/Clone the latest Tagged Release version (To ensure you are working on a stable version).
+2. Upload the New Large assets file(s) (eg. New 3D models) to your google drive share folder (I am assuming you are the project admin and have permission to upload to the shared google drive folder). 
+3. Open/Load this app using visual studio and switch to debug version. 
+![Image of step1](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/upload-step1.PNG)
+
+4. When running the app in debug version, you should be able to see a new button "GenerateMetaData". All you have to do is click on this button after new files are uploaded to google drive in the correct folder. New timestamp.json file will be generate in the ue4 project's content/lfs/timestamp folder and the metadata.json file in the content/lfs folder should be updated to point to this new timestamp file.
+![Image of step2](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/upload-step2.PNG)
+
+5. Finally, commit and push the ue4 project's updates (It is recommend to do this in its own commit rahter than along with project's other code changes.)
+
+# How it work
+
+
 # remix project
 If you are remixing this project for your own, make sure you update credentials.json with your own app.

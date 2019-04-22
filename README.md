@@ -55,7 +55,20 @@ The step are actually quite simple:
 5. Finally, commit and push the ue4 project's updates (It is recommend to do this in its own commit rahter than along with project's other code changes.)
 
 # How it work
+This App works by syncing files in the share google drive folder/files with the corresponding folders/files in your local ue4 project.
+It works as below:
+1. Lookup the metadata.json file in the ue4's content/lfs folder to find the corresponding timestamp.json file for the current active branch. The metadata.json file will only contain reference to it's current active timestamp.json file.
+![Image of step1](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/about-step1.PNG)
 
+![Image of step2](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/about-step2.PNG)
+
+2. Lookup the corresponding timestamp.json file in the ue4's content/lfs folder. 
+![Image of step3](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/about-step3.PNG)
+
+timestamp.json file will contain a list of filesname (related to the unique filename in google drive) and it's corresponding path (related to local file's relative path)
+![Image of step4](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/about-step4.PNG)
+
+3. Search corresponding files in google drive and download new files if not exist in the current local folder. (Will remove first then download new).
 
 # remix project
 If you are remixing this project for your own, make sure you update credentials.json with your own app.

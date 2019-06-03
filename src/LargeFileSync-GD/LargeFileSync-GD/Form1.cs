@@ -71,7 +71,7 @@ namespace LargeFileSync_GD
 
         private void Form1_Load(object sender, EventArgs e)
         {
-#if !DEBUG
+#if (RELEASE)
             btnGenerateMetaData.Visible = false;
             btnSyncFiles.Height = 147;
 #endif
@@ -709,7 +709,7 @@ namespace LargeFileSync_GD
 
         private void btnGenerateMetaData_Click(object sender, EventArgs e)
         {
-#if DEBUG
+#if (DEBUG || ADMIN)
             createLocalFilesTimeStampData();
 #else
             MessageBox.Show("Available for Debug Mode Only - For ppl that know what this is doing!");

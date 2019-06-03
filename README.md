@@ -4,7 +4,7 @@ Custom Large File Sync for Google Drive
 # About
 This application is created for projectMMW (https://github.com/opensourcegamedevelopment/ProjectMMW-UE) to sync Large file assets from google drive. It is Open-Source and under MIT license so feel free to remix for you own uses. 
 
-# configuration (For project Members)
+# Configuration (For project Members)
 1. Open LargeFileSync-GD.exe
 
 ![Image of step1](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step1.PNG)
@@ -23,10 +23,10 @@ This application is created for projectMMW (https://github.com/opensourcegamedev
 
 #### Note: This will only work for project that is setup correctly to uses lfs, for more information or if you have any issues contact me on our Discord channel at: https://discord.gg/eE4vjFN
 
-# Syncing workflow
+## Syncing workflow
 Once setup completed, for future workflow. Simply switch project branch to the branch you are working on. Then open this lfs-gd app and click sync content files.
 
-# Authorisation
+## Authorisation
 The first time you run the app, it will prompt you to authorize access to your google account:
 
 1. The app will attempt to open a new window or tab in your default browser.
@@ -39,12 +39,25 @@ The app will proceed automatically, and you may close the window/tab.
 #### Note: you will need to accept and hit the the share folder provided to you by project admin atleast once for this syncing to work. 
 #### Note2: Because of the way google drive folder structure works. All files use for this syncing mechanic MUST have unique filenames.
 
-# Adding New Large Asset Data Files (Project Admin Use only)
+# Configuration (For project Admin)
+
+## First Time configuration (Getting Credentials.json)
+Follow the steps below if you are a project admin using this for your own project. If there are any issues contact me on our Discord channel at: https://discord.gg/eE4vjFN 
+
+1. First you need to register for a google account to store the Large Files. This can be any basic account. Google offer 15GB for free storage. (I would recommend to create a seperate account for the project only as we are going to share the credential file for other member of the project to use, however, personal account will also work fine.)  
+https://one.google.com/storage
+
+2. Next you will need to login to the google account and click on the enable drive api button below:
+https://developers.google.com/drive/api/v3/quickstart/dotnet
+There should be instrcution on the process including choosing a project/app name. Once that is done you should be albe to download the credentail file for the app. (Make sure you store this in a safe place.)
+![Image of credentials](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/credentials.PNG)
+
+## Adding New Large Asset Data Files (Project Admin Use only)
 Adding new Large Asset Data files should be done by Project Admin only (For those that know what they are doing) as to prevent breaking the whole syncing process. I had setup so that this can only be done using the debug version of this app to prevent users accidently breaking the syncing.
 
 The step are actually quite simple:
 
-1. Downlaod/Clone the latest Tagged Release version (To ensure you are working on a stable version).
+1. Downlaod/Clone the latest Tagged Release version's Source Code (To ensure you are working on a stable version).
 2. Upload the New Large assets file(s) (eg. New 3D models) to your google drive share folder (I am assuming you are the project admin and have permission to upload to the shared google drive folder). 
 3. Open/Load this app using visual studio and switch to debug version. 
 ![Image of step1](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/upload-step1.PNG)

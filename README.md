@@ -6,6 +6,7 @@ This application is created for projectMMW (https://github.com/opensourcegamedev
 
 ## Guide Line:
 Project Manager/Admin: Use Admin.rar version
+
 Project Members: User Release.rar Version
 
 ## Configuration (For project Members)

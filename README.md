@@ -57,6 +57,8 @@ https://developers.google.com/drive/api/v3/quickstart/dotnet
 There should be instrcution on the process including choosing a project/app name. Once that is done you should be albe to download the credentail file for the app. (Make sure you store this in a safe place.)
 ![Image of credentials](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/credentials.PNG)
 
+If that did not work, follow the instruction explained here: https://www.iperiusbackup.net/en/how-to-enable-google-drive-api-and-get-client-credentials/
+
 ## Adding New Large Asset Data Files (Project Admin Use only)
 Adding new Large Asset Data files should be done by Project Admin only (For those that know what they are doing) as to prevent breaking the whole syncing process. I had setup so that this can only be done using the debug version of this app to prevent users accidently breaking the syncing.
 

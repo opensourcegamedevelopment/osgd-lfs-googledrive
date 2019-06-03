@@ -4,7 +4,7 @@ Custom Large File Sync for Google Drive
 # About
 This application is created for projectMMW (https://github.com/opensourcegamedevelopment/ProjectMMW-UE) to sync Large file assets from google drive. It is Open-Source and under MIT license so feel free to remix for you own uses. 
 
-# configuration
+# configuration (For project Members)
 1. Open LargeFileSync-GD.exe
 
 ![Image of step1](https://raw.githubusercontent.com/opensourcegamedevelopment/osgd-lfs-googledrive/master/images/step1.PNG)
@@ -21,7 +21,7 @@ This application is created for projectMMW (https://github.com/opensourcegamedev
 
 6. Once done (if the project is configured correctly), simply click on Sync Content files button to automatically download the required content files. 
 
-#### Note: This will only work for project that is setup correctly to uses lfs, for more information contact me on zerokiri or on our Discord channel at: https://discord.gg/A2tnTSH
+#### Note: This will only work for project that is setup correctly to uses lfs, for more information or if you have any issues contact me on our Discord channel at: https://discord.gg/eE4vjFN
 
 # Syncing workflow
 Once setup completed, for future workflow. Simply switch project branch to the branch you are working on. Then open this lfs-gd app and click sync content files.
@@ -40,7 +40,7 @@ The app will proceed automatically, and you may close the window/tab.
 #### Note2: Because of the way google drive folder structure works. All files use for this syncing mechanic MUST have unique filenames.
 
 # Adding New Large Asset Data Files (Project Admin Use only)
-Adding new Large Asset Data files should be done by Project Admin only (For those that know what they are doing) as to prevent breaking the whole syncing process. I had setup so that this can only be done using the debug version of this app try prevent users accidently breaking the syncing.
+Adding new Large Asset Data files should be done by Project Admin only (For those that know what they are doing) as to prevent breaking the whole syncing process. I had setup so that this can only be done using the debug version of this app to prevent users accidently breaking the syncing.
 
 The step are actually quite simple:
 

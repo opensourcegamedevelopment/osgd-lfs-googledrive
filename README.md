@@ -78,10 +78,9 @@ The step are actually quite simple:
 2. Activate Drive API and download credentials.json
 
 #### Setup for Project Admin
-1. Download visual studio
-2. Download source code from github.
-3. Open project in visual studio and Switch to debug mode then compile/run the app. 
-(I will write a separate app for admin later when I have time so that the above 3 steps wont be necessary)
+1. Download Admin.rar version of this app
+2. unrar the archive
+3. run LargeFileSync-GD.exe
 4. load in the credentials.json. (If popup don't appear, you can click on the Re-authenticate button.)
 5.  Click on the Setting button to enter in your settings. 
 

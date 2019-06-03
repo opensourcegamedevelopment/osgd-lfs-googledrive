@@ -90,6 +90,10 @@ Project Name is the name of the root project folder in the share google drive wh
 7. Upload the content files into your google drive folder. You will have to share this folder with your project members, this folder should also be the same name as the project Name you had entered in step 5 (recommend no spaces).
 I would also recommend to upload all files to the google drive in this default root folder rather than sub-folders and google drive api doesn't treat sub-folders in a folder structure. (eg. ProjectMMW/rifle.uasset instead of ProjectMMW/3DModels/Weapons/rifle.uasset)
 
+Note: Due to the way google drive api sync data, project member need to access each shared folder because google drive api can access content from them. 
+Eg. If the shared conent folder conatins ProjectMMW/3DModels/Weapons/rifle.uasset and ProjectMMW/3DModels/Armors/plateArmor.uasset 
+Project member need to open/view those 2 folders in the google drive webbrowser before the api can assess the two files (rifle.uasset and plateArmor.uasset). Thus I would recommend to place them all in the root folder ProjectMMW/rifle.uasset and ProjectMMW/plateArmor.uasset so that project member only need to view ProjectMMW once to ensure all data is sync-able.  
+
 8. Click on the GenerateMetaData button, this will create the LFS folder along with the timestamp files inside the content folder. 
 
 9. You will then need to commit/push this LFS folder to your github project repo.
